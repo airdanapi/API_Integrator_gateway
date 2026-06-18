@@ -219,4 +219,4 @@ Berikut adalah kontrak API utama untuk integrator:
 
 ---
 
-Dokumen ini dibuat berdasarkan data di folder `dokumen_tugas` dan menitikberatkan pada peran API Integrator sebagai pengatur lalu lintas request antar sistem dan pelindung integrasi SmartBank.
+Dokumen ini dibuat berdasarkan data di folder `docs/misc/source-data` dan menitikberatkan pada peran API Integrator sebagai pengatur lalu lintas request antar sistem dan pelindung integrasi SmartBank.

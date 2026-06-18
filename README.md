@@ -109,7 +109,14 @@ docker compose build
 |   `-- internal/server/     # Fiber app factory dan routes
 |-- frontend/
 |   `-- src/                 # React application dan tests
-|-- docs/                    # PRD, sprint plan, dan backlog GitHub
+|-- docs/
+|   |-- architecture/       # Diagram dan dokumentasi arsitektur
+|   |-- development/        # Panduan teknis pengembangan
+|   |-- planning/           # Roadmap implementasi sprint
+|   |-- project-management/ # Backlog dan administrasi proyek
+|   |-- requirements/       # Kebutuhan dan kontrak produk
+|   |-- report/             # Laporan pelaksanaan sprint
+|   `-- misc/source-data/   # Data sumber tugas besar
 |-- .github/workflows/       # Continuous integration
 `-- compose.yaml             # Frontend, backend, dan MySQL
 ```

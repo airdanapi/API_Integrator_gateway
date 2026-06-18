@@ -35,7 +35,7 @@ Aplikasi dibangun untuk mendukung skema tugas besar: API integrator yang menjadi
 
 ## 3.1 Sumber Data API
 - API dan endpoint yang akan dihubungkan didasarkan pada file:
-  - `dokumen_tugas/TugasBesar_Plan.xlsx - 2. Fungsional.csv`
+  - `docs/misc/source-data/TugasBesar_Plan.xlsx - 2. Fungsional.csv`
 - Dokumen tersebut memuat daftar fitur, endpoint, input, proses, output, dan kontrak API untuk SmartBank, Marketplace, POS, SupplierHub, dan LogistiKita.
 - List sumber data API:
   - `SmartBank`: endpoint terkait registrasi/login, manajemen saldo, transfer, pembayaran transaksi, pinjaman, pajak/biaya, ledger transaksi, biaya layanan bank.
