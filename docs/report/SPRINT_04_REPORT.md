@@ -8,7 +8,7 @@
 | Sprint | Sprint 4 — Authentication System - Frontend |
 | Tanggal laporan | 18 Juni 2026 |
 | PIC | `venalism` |
-| Commit implementasi | Belum dibuat; perubahan berada di working tree |
+| Commit implementasi | `daf59c2` |
 | Status | Selesai |
 
 ## Ringkasan Eksekutif
