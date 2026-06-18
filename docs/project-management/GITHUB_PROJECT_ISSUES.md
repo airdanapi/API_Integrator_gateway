@@ -106,11 +106,11 @@ Mengimplementasikan login page dan session management frontend.
 
 ### Tasks
 
-- [ ] Buat login form dan validasi error
-- [ ] Setup React Router dan protected routes
-- [ ] Implementasikan auth state dan login API
-- [ ] Simpan token dan pasang request interceptor
-- [ ] Implementasikan logout
+- [x] Buat login form dan validasi error
+- [x] Setup React Router dan protected routes
+- [x] Implementasikan auth state dan login API
+- [x] Simpan token dan pasang request interceptor
+- [x] Implementasikan logout
 
 ### Deliverables
 
@@ -119,10 +119,10 @@ Mengimplementasikan login page dan session management frontend.
 
 ### Acceptance Criteria
 
-- [ ] Kredensial valid dapat login
-- [ ] Kredensial invalid menampilkan error
-- [ ] Sesi bertahan setelah refresh bila token valid
-- [ ] Logout menghapus token
+- [x] Kredensial valid dapat login
+- [x] Kredensial invalid menampilkan error
+- [x] Sesi bertahan setelah refresh bila token valid
+- [x] Logout menghapus token
 
 ## [Sprint 5] Database
 

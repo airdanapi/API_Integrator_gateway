@@ -150,8 +150,8 @@ func TestLandingEndpointContractIsPublic(t *testing.T) {
 	if body.Data.ContactInfo.RepositoryURL != "https://github.com/airdanapi/API_Integrator_gateway" {
 		t.Errorf("repository URL = %q, want official repository", body.Data.ContactInfo.RepositoryURL)
 	}
-	if body.Data.ContactInfo.LoginStatus != "coming_soon" {
-		t.Errorf("login status = %q, want coming_soon", body.Data.ContactInfo.LoginStatus)
+	if body.Data.ContactInfo.LoginStatus != "available" {
+		t.Errorf("login status = %q, want available", body.Data.ContactInfo.LoginStatus)
 	}
 }
 

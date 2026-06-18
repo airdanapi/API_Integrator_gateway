@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth/auth-context'
 import BrandMark from './BrandMark'
 import { navigationItems } from '../data/landingContent'
 
@@ -17,6 +19,40 @@ function NavigationLinks({ onNavigate }) {
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { status, dashboardPath, logout } = useAuth()
+  const navigate = useNavigate()
+  const authenticated = status === 'authenticated'
+
+  function handleLogout() {
+    logout()
+    setMenuOpen(false)
+    navigate('/login')
+  }
+
+  const authActions = authenticated ? (
+    <>
+      <Link
+        to={dashboardPath}
+        className="rounded-xl border border-blue-200 px-4 py-2.5 text-sm font-bold text-blue-800 transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+      >
+        Dashboard
+      </Link>
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950"
+      >
+        Logout
+      </button>
+    </>
+  ) : (
+    <Link
+      to="/login"
+      className="rounded-xl border border-blue-200 px-4 py-2.5 text-sm font-bold text-blue-800 transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+    >
+      Login
+    </Link>
+  )
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur">
@@ -37,9 +73,7 @@ function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <span className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 ring-1 ring-inset ring-amber-200">
-            Login segera hadir
-          </span>
+          {authActions}
           <a
             href="#kontak"
             className="rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
@@ -89,9 +123,35 @@ function Header() {
         >
           <div className="mx-auto flex max-w-7xl flex-col gap-1">
             <NavigationLinks onNavigate={() => setMenuOpen(false)} />
+            {authenticated ? (
+              <>
+                <Link
+                  to={dashboardPath}
+                  className="mt-3 rounded-xl border border-blue-200 px-4 py-3 text-center text-sm font-bold text-blue-800"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  className="rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-700"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="mt-3 rounded-xl border border-blue-200 px-4 py-3 text-center text-sm font-bold text-blue-800"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
+            )}
             <a
               href="#kontak"
-              className="mt-3 rounded-xl bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white"
+              className="rounded-xl bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white"
               onClick={() => setMenuOpen(false)}
             >
               Hubungi kami

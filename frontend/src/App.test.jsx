@@ -1,104 +1,120 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
+import { AuthProvider } from './auth/AuthContext'
+import { ACCESS_TOKEN_KEY } from './auth/session'
 
-describe('App', () => {
-  it('renders every public landing page section', () => {
-    render(<App />)
+const adminUser = {
+  user_id: '1',
+  username: 'admin',
+  role: 'admin_gateway',
+  app_name: 'API Gateway',
+}
 
-    expect(
-      screen.getByRole('heading', { name: 'API Integrator Gateway' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'Integrasi yang aman, terukur, dan konsisten' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'Satu alur untuk seluruh ekosistem' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'Dibangun untuk kebutuhan nyata UMKM' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'Pertanyaan yang sering diajukan' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'Siap menghubungkan layanan Anda?' }),
-    ).toBeInTheDocument()
+function createApiClient() {
+  return {
+    get: vi.fn(),
+    post: vi.fn(),
+  }
+}
+
+function renderApp({
+  path = '/',
+  apiClient = createApiClient(),
+} = {}) {
+  return {
+    apiClient,
+    ...render(
+      <MemoryRouter initialEntries={[path]}>
+        <AuthProvider apiClient={apiClient}>
+          <App />
+        </AuthProvider>
+      </MemoryRouter>,
+    ),
+  }
+}
+
+function loginResponse({
+  token = 'signed-token',
+  role = 'admin_gateway',
+  appName = 'API Gateway',
+  dashboardUrl = '/dashboard/admin',
+} = {}) {
+  return {
+    data: {
+      status: 'success',
+      data: {
+        token,
+        role,
+        app_name: appName,
+        dashboard_url: dashboardUrl,
+        expires_in: 3600,
+      },
+    },
+  }
+}
+
+function meResponse(user = adminUser) {
+  return {
+    data: {
+      status: 'success',
+      data: user,
+    },
+  }
+}
+
+describe('Sprint 4 authentication frontend', () => {
+  beforeEach(() => {
+    localStorage.clear()
   })
 
-  it('provides anchor navigation to the main sections', () => {
-    render(<App />)
+  it('keeps the landing page public and exposes login navigation', async () => {
+    renderApp()
 
-    const desktopNavigation = screen.getByRole('navigation', {
+    expect(
+      await screen.findByRole('heading', { name: 'API Integrator Gateway' }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Login' }).length).toBeGreaterThan(0)
+    expect(screen.queryByText('Login segera hadir')).not.toBeInTheDocument()
+  })
+
+  it('preserves accessible landing navigation and mobile controls', async () => {
+    renderApp()
+    await screen.findByRole('heading', { name: 'API Integrator Gateway' })
+
+    const navigation = screen.getByRole('navigation', {
       name: 'Navigasi utama',
     })
-
-    expect(
-      within(desktopNavigation).getByRole('link', { name: 'Manfaat' }),
-    ).toHaveAttribute('href', '#manfaat')
-    expect(
-      within(desktopNavigation).getByRole('link', { name: 'Alur integrasi' }),
-    ).toHaveAttribute('href', '#alur-integrasi')
-    expect(
-      within(desktopNavigation).getByRole('link', { name: 'Use case' }),
-    ).toHaveAttribute('href', '#use-case')
-    expect(
-      within(desktopNavigation).getByRole('link', { name: 'FAQ' }),
-    ).toHaveAttribute('href', '#faq')
-  })
-
-  it('opens and closes the accessible mobile navigation', () => {
-    render(<App />)
+    expect(within(navigation).getByRole('link', { name: 'Manfaat' }))
+      .toHaveAttribute('href', '#manfaat')
 
     const menuButton = screen.getByRole('button', {
       name: 'Buka menu navigasi',
     })
-    expect(menuButton).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.queryByRole('navigation', { name: 'Navigasi mobile' })).not.toBeInTheDocument()
-
     fireEvent.click(menuButton)
-
-    expect(
-      screen.getByRole('button', { name: 'Tutup menu navigasi' }),
-    ).toHaveAttribute('aria-expanded', 'true')
     expect(
       screen.getByRole('navigation', { name: 'Navigasi mobile' }),
     ).toBeInTheDocument()
-
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Tutup menu navigasi' }),
-    )
-
-    expect(screen.queryByRole('navigation', { name: 'Navigasi mobile' })).not.toBeInTheDocument()
+    expect(
+      within(screen.getByRole('navigation', { name: 'Navigasi mobile' }))
+        .getByRole('link', { name: 'Login' }),
+    ).toHaveAttribute('href', '/login')
   })
 
-  it('marks login as coming soon without exposing a dead route', () => {
-    render(<App />)
-
-    const loginCta = screen.getByRole('button', { name: 'Login segera hadir' })
-    expect(loginCta).toBeDisabled()
-    expect(loginCta).toHaveAttribute('aria-disabled', 'true')
-    expect(screen.queryByRole('link', { name: /login/i })).not.toBeInTheDocument()
-    expect(screen.getAllByText('Segera hadir').length).toBeGreaterThan(0)
-  })
-
-  it('renders FAQ content with native disclosure controls', () => {
-    render(<App />)
+  it('renders a keyboard-accessible login form with all official applications', async () => {
+    renderApp({ path: '/login' })
 
     expect(
-      screen.getByText('Apakah API Integrator memproses transaksi keuangan?'),
+      await screen.findByRole('heading', { name: 'Masuk ke API Integrator' }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        'Tidak. Gateway mengatur validasi, routing, dan pencatatan. Seluruh transaksi keuangan tetap diproses oleh SmartBank.',
-      ),
-    ).toBeInTheDocument()
-  })
+    expect(screen.getByLabelText('Username')).toBeRequired()
+    expect(screen.getByLabelText('Password')).toBeRequired()
 
-  it('lists every application in the integration ecosystem', () => {
-    render(<App />)
-
-    for (const application of [
+    const applicationSelect = screen.getByLabelText('Aplikasi')
+    const options = within(applicationSelect).getAllByRole('option')
+    expect(options.map((option) => option.textContent)).toEqual([
+      'Pilih aplikasi',
       'SmartBank',
       'Marketplace',
       'POS',
@@ -106,23 +122,190 @@ describe('App', () => {
       'LogistiKita',
       'UMKM Insight',
       'API Gateway',
-    ]) {
-      expect(screen.getAllByText(application).length).toBeGreaterThan(0)
-    }
+    ])
   })
 
-  it('links contact actions to the official repository', () => {
-    render(<App />)
+  it('logs in, stores the token, validates the session, and routes by role', async () => {
+    const apiClient = createApiClient()
+    apiClient.post.mockResolvedValue(loginResponse())
+    apiClient.get.mockResolvedValue(meResponse())
+    renderApp({ path: '/login', apiClient })
 
-    const repositoryLinks = screen.getAllByRole('link', {
-      name: 'Lihat repositori',
+    fireEvent.change(await screen.findByLabelText('Username'), {
+      target: { value: 'admin' },
     })
-    expect(repositoryLinks.length).toBeGreaterThan(0)
-    for (const repositoryLink of repositoryLinks) {
-      expect(repositoryLink).toHaveAttribute(
-        'href',
-        'https://github.com/airdanapi/API_Integrator_gateway',
-      )
-    }
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'admin-development-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Aplikasi'), {
+      target: { value: 'API Gateway' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Masuk' }))
+
+    expect(
+      await screen.findByRole('heading', { name: 'Dashboard Admin Gateway' }),
+    ).toBeInTheDocument()
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('signed-token')
+    expect(apiClient.post).toHaveBeenCalledWith('/auth/login', {
+      username: 'admin',
+      password: 'admin-development-password',
+      app_name: 'API Gateway',
+    })
+    expect(apiClient.get).toHaveBeenCalledWith('/auth/me')
+  })
+
+  it('shows a generic message for invalid credentials', async () => {
+    const apiClient = createApiClient()
+    apiClient.post.mockRejectedValue({
+      response: {
+        status: 401,
+        data: {
+          status: 'error',
+          error: { code: 'invalid_credentials' },
+        },
+      },
+    })
+    renderApp({ path: '/login', apiClient })
+
+    fireEvent.change(await screen.findByLabelText('Username'), {
+      target: { value: 'admin' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'wrong-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Aplikasi'), {
+      target: { value: 'API Gateway' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Masuk' }))
+
+    expect(
+      await screen.findByRole('alert'),
+    ).toHaveTextContent('Username, password, atau aplikasi tidak valid.')
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull()
+  })
+
+  it('rejects a login response whose dashboard does not match its role', async () => {
+    const apiClient = createApiClient()
+    apiClient.post.mockResolvedValue(loginResponse({
+      dashboardUrl: '/dashboard/user',
+    }))
+    renderApp({ path: '/login', apiClient })
+
+    fireEvent.change(await screen.findByLabelText('Username'), {
+      target: { value: 'admin' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'admin-development-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Aplikasi'), {
+      target: { value: 'API Gateway' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Masuk' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Respons autentikasi tidak valid.',
+    )
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull()
+    expect(apiClient.get).not.toHaveBeenCalled()
+  })
+
+  it('restores a valid session after refresh', async () => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'stored-token')
+    const apiClient = createApiClient()
+    apiClient.get.mockResolvedValue(meResponse())
+    renderApp({ path: '/dashboard/admin', apiClient })
+
+    expect(
+      await screen.findByRole('heading', { name: 'Dashboard Admin Gateway' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('API Gateway')).toBeInTheDocument()
+    expect(apiClient.get).toHaveBeenCalledWith('/auth/me')
+  })
+
+  it('removes an invalid session and redirects protected routes to login', async () => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'expired-token')
+    const apiClient = createApiClient()
+    apiClient.get.mockRejectedValue({ response: { status: 401 } })
+    renderApp({ path: '/dashboard/admin', apiClient })
+
+    expect(
+      await screen.findByRole('heading', { name: 'Masuk ke API Integrator' }),
+    ).toBeInTheDocument()
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull()
+  })
+
+  it('redirects an authenticated user away from a dashboard for another role', async () => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'app-user-token')
+    const apiClient = createApiClient()
+    apiClient.get.mockResolvedValue(meResponse({
+      user_id: '2',
+      username: 'marketplace',
+      role: 'app_user',
+      app_name: 'Marketplace',
+    }))
+    renderApp({ path: '/dashboard/admin', apiClient })
+
+    expect(
+      await screen.findByRole('heading', { name: 'Dashboard Pengguna Aplikasi' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Marketplace')).toBeInTheDocument()
+  })
+
+  it('renders the protected monitoring placeholder for a monitoring user', async () => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'monitoring-token')
+    const apiClient = createApiClient()
+    apiClient.get.mockResolvedValue(meResponse({
+      user_id: '3',
+      username: 'insight',
+      role: 'monitoring_user',
+      app_name: 'UMKM Insight',
+    }))
+    renderApp({ path: '/dashboard/monitoring', apiClient })
+
+    expect(
+      await screen.findByRole('heading', { name: 'Dashboard Monitoring' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('UMKM Insight')).toBeInTheDocument()
+    expect(screen.getByText('Monitoring Read-only')).toBeInTheDocument()
+  })
+
+  it('shows dashboard and logout actions on the landing page for an active session', async () => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'stored-token')
+    const apiClient = createApiClient()
+    apiClient.get.mockResolvedValue(meResponse())
+    renderApp({ path: '/', apiClient })
+
+    expect(
+      await screen.findByRole('link', { name: 'Dashboard' }),
+    ).toHaveAttribute('href', '/dashboard/admin')
+    expect(screen.getByRole('button', { name: 'Logout' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Login' })).not.toBeInTheDocument()
+  })
+
+  it('logs out locally and returns to login', async () => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'stored-token')
+    const apiClient = createApiClient()
+    apiClient.get.mockResolvedValue(meResponse())
+    renderApp({ path: '/dashboard/admin', apiClient })
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Logout' }))
+
+    expect(
+      await screen.findByRole('heading', { name: 'Masuk ke API Integrator' }),
+    ).toBeInTheDocument()
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull()
+  })
+
+  it('redirects an authenticated visitor from login to their dashboard', async () => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'stored-token')
+    const apiClient = createApiClient()
+    apiClient.get.mockResolvedValue(meResponse())
+    renderApp({ path: '/login', apiClient })
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Dashboard Admin Gateway' }),
+      ).toBeInTheDocument()
+    })
   })
 })

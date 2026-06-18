@@ -1,4 +1,4 @@
-function BrandMark({ compact = false }) {
+function BrandMark({ compact = false, inverse = false }) {
   return (
     <span className="inline-flex items-center gap-3">
       <span
@@ -19,10 +19,14 @@ function BrandMark({ compact = false }) {
         </svg>
       </span>
       <span className="leading-tight">
-        <span className="block text-sm font-extrabold tracking-tight text-slate-950 sm:text-base">
+        <span
+          className={`${inverse ? 'text-white' : 'text-slate-950'} block text-sm font-extrabold tracking-tight sm:text-base`}
+        >
           API Integrator
         </span>
-        <span className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-blue-700">
+        <span
+          className={`${inverse ? 'text-blue-100' : 'text-blue-700'} block text-[0.65rem] font-semibold uppercase tracking-[0.18em]`}
+        >
           Gateway UMKM
         </span>
       </span>

@@ -93,6 +93,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 
 ## Sprint 4: Authentication System - Frontend
 **Duration:** Week 4  
+**Status:** Selesai pada 18 Juni 2026  
 **Goal:** Implementasi login page dan session management di frontend.
 
 ### Tasks

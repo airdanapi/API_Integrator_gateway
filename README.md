@@ -2,16 +2,17 @@
 
 Menyediakan spesifikasi produk untuk modul API Integrator yang menjadi pintu masuk semua komunikasi antar aplikasi dalam ekosistem UMKM. API Integrator memastikan routing, keamanan, validasi, logging, dan standarisasi semua request sebelum diteruskan ke SmartBank atau layanan lain.
 
-Sprint 3 menyediakan autentikasi backend berbasis MySQL, bcrypt, dan JWT.
+Sprint 4 menyediakan login frontend, session management JWT, route protection,
+dan placeholder dashboard berdasarkan role.
 Laporan implementasi tersedia pada
-[Sprint 3 Report](docs/report/SPRINT_03_REPORT.md).
+[Sprint 4 Report](docs/report/SPRINT_04_REPORT.md).
 
 ## Kebutuhan
 
 - Docker Desktop dengan Docker Compose v2; atau
 - Node.js 24 LTS dan npm 11; serta
 - Go 1.26.4 atau lebih baru; dan
-- MySQL 9.7 LTS untuk setup tanpa Docker.
+- MySQL Community Server 9.7 untuk setup tanpa Docker.
 
 ## Setup tercepat dengan Docker
 
@@ -30,6 +31,7 @@ docker compose up --build
 Layanan yang tersedia:
 
 - Frontend: <http://localhost:5173>
+- Frontend login: <http://localhost:5173/login>
 - Backend health check: <http://localhost:8080/health>
 - Backend landing content: <http://localhost:8080/landing>
 - Backend login: `POST http://localhost:8080/auth/login`
@@ -95,8 +97,8 @@ Landing page dapat diakses tanpa login dan menyediakan:
 - Use case integrasi, FAQ, serta tautan ke repositori.
 - Navigasi responsif dengan dukungan keyboard dan mobile menu.
 
-CTA login sengaja berstatus `Segera hadir`. Autentikasi dan halaman login
-frontend berada pada Sprint 4, tetapi backend autentikasi sudah tersedia.
+CTA login membuka halaman autentikasi Sprint 4. Landing page tetap dapat
+diakses tanpa sesi.
 
 ## Authentication backend Sprint 3
 
@@ -132,6 +134,34 @@ Role yang tersedia:
 
 `POST /auth/logout` tidak tersedia karena token bersifat stateless. Sprint 4
 melakukan logout dengan menghapus token di sisi frontend.
+
+## Authentication frontend Sprint 4
+
+Frontend menyediakan route:
+
+- `/login` untuk autentikasi.
+- `/dashboard/admin` untuk `admin_gateway`.
+- `/dashboard/user` untuk `app_user`.
+- `/dashboard/monitoring` untuk `monitoring_user`.
+
+Login meminta `username`, `password`, dan aplikasi. JWT disimpan sebagai satu
+item `access_token` pada `localStorage`, dipasang sebagai Bearer token oleh
+Axios, dan diverifikasi kembali melalui `GET /auth/me` ketika halaman dimuat
+ulang. Response `401`, token kedaluwarsa, dan logout akan menghapus token lokal.
+Pengguna yang mencoba membuka dashboard role lain diarahkan ke dashboard milik
+role mereka.
+
+Kredensial seed development:
+
+| Role | Username | Password | Aplikasi |
+| --- | --- | --- | --- |
+| `admin_gateway` | `admin` | `admin-development-password` | API Gateway |
+| `app_user` | `marketplace` | `marketplace-development-password` | Marketplace |
+| `monitoring_user` | `insight` | `insight-development-password` | UMKM Insight |
+
+Kredensial tersebut hanya untuk development dan harus diganti pada environment
+bersama. Dashboard Sprint 4 masih berupa placeholder; data operasional admin
+dan user dijadwalkan pada sprint dashboard berikutnya.
 
 ## Test dan build
 
@@ -179,8 +209,11 @@ docker compose ps
 |       `-- server/          # Fiber app factory, middleware, dan routes
 |-- frontend/
 |   `-- src/
-|       |-- components/      # Komponen landing page
+|       |-- auth/            # Context sesi, route guard, dan token storage
+|       |-- components/      # Komponen UI bersama dan landing page
 |       |-- data/            # Konten statis landing page
+|       |-- pages/           # Landing, login, dan placeholder dashboard
+|       |-- services/        # Axios API client dan interceptor
 |       `-- test/            # Setup pengujian frontend
 |-- docs/
 |   |-- architecture/       # Diagram dan dokumentasi arsitektur
@@ -222,7 +255,7 @@ docker compose ps
     "integration_flow": [],
     "contact_info": {
       "repository_url": "https://github.com/airdanapi/API_Integrator_gateway",
-      "login_status": "coming_soon"
+      "login_status": "available"
     }
   }
 }

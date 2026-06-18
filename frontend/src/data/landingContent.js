@@ -143,7 +143,7 @@ export const faqs = [
   {
     question: 'Apakah landing page membutuhkan login?',
     answer:
-      'Tidak. Landing page bersifat publik. Autentikasi diperlukan pada fitur operasional dan dashboard yang akan dibangun pada sprint berikutnya.',
+      'Tidak. Landing page bersifat publik. Login hanya diperlukan untuk mengakses dashboard sesuai peran pengguna.',
   },
   {
     question: 'Bagaimana gateway menjaga konsistensi integrasi?',

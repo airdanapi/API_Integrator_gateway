@@ -15,6 +15,7 @@ pelaporan proyek API Integrator Gateway.
 | [Sprint 1 Report](report/SPRINT_01_REPORT.md) | Laporan hasil Project Setup & Infrastructure pada 18 Juni 2026. |
 | [Sprint 2 Report](report/SPRINT_02_REPORT.md) | Laporan landing page, endpoint publik, TDD, dan verifikasi responsif pada 18 Juni 2026. |
 | [Sprint 3 Report](report/SPRINT_03_REPORT.md) | Laporan autentikasi backend, JWT, migration MySQL, TDD, dan upgrade Docker pada 18 Juni 2026. |
+| [Sprint 4 Report](report/SPRINT_04_REPORT.md) | Laporan login frontend, session management, protected route, TDD, Docker, dan smoke test pada 18 Juni 2026. |
 | [Miscellaneous Source Data](misc/source-data/) | Data CSV sumber tugas besar yang dipertahankan sebagai referensi. |
 
 ## Struktur

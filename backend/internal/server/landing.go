@@ -123,7 +123,7 @@ func landingHandler(c fiber.Ctx) error {
 			},
 			ContactInfo: landingContactInfo{
 				RepositoryURL: "https://github.com/airdanapi/API_Integrator_gateway",
-				LoginStatus:   "coming_soon",
+				LoginStatus:   "available",
 			},
 		},
 	})
