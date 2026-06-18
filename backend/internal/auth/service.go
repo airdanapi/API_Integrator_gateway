@@ -69,6 +69,7 @@ func (service *Service) Login(
 		request.AppName,
 	)
 	if errors.Is(err, repository.ErrUserNotFound) {
+		_ = service.password.Compare(dummyPasswordHash, request.Password)
 		return LoginResult{}, ErrInvalidCredentials
 	}
 	if err != nil {

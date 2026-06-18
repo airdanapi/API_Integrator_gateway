@@ -8,7 +8,7 @@
 | Sprint | Sprint 2 — Landing Page & Static Content |
 | Tanggal laporan | 18 Juni 2026 |
 | PIC | `venalism` |
-| Commit implementasi | 93dd9e8 |
+| Commit implementasi | `93dd9e8` |
 | Status | Selesai |
 
 ## Ringkasan Eksekutif

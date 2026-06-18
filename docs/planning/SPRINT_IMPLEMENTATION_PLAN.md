@@ -398,9 +398,9 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 
 | Sprint | Week | Focus Area | Status |
 |--------|------|-----------|--------|
-| 1 | 1 | Project Setup | Planning |
-| 2 | 2 | Landing Page | Planning |
-| 3 | 3 | Auth Backend | Planning |
+| 1 | 1 | Project Setup | Selesai |
+| 2 | 2 | Landing Page | Selesai |
+| 3 | 3 | Auth Backend | Selesai |
 | 4 | 4 | Auth Frontend | Planning |
 | 5 | 5 | Database Schema | Planning |
 | 6 | 6 | Dashboard Admin Backend | Planning |

@@ -23,10 +23,12 @@ func (stub stubUserReader) FindByUsernameAndApp(
 }
 
 type stubPasswordVerifier struct {
-	err error
+	err   error
+	calls int
 }
 
-func (stub stubPasswordVerifier) Compare(string, string) error {
+func (stub *stubPasswordVerifier) Compare(string, string) error {
+	stub.calls++
 	return stub.err
 }
 
@@ -61,7 +63,7 @@ func TestServiceLoginReturnsRoleSpecificDashboard(t *testing.T) {
 					Role:         test.role,
 					AppName:      "Application",
 				}},
-				stubPasswordVerifier{},
+				&stubPasswordVerifier{},
 				stubTokenIssuer{token: "signed-token", expiresIn: 3600},
 			)
 
@@ -107,9 +109,10 @@ func TestServiceLoginUsesOneGenericCredentialError(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			verifier := &stubPasswordVerifier{err: test.verifier.err}
 			service := NewService(
 				test.reader,
-				test.verifier,
+				verifier,
 				stubTokenIssuer{err: test.tokenError},
 			)
 			_, err := service.Login(context.Background(), LoginRequest{
@@ -119,6 +122,12 @@ func TestServiceLoginUsesOneGenericCredentialError(t *testing.T) {
 			})
 			if !errors.Is(err, ErrInvalidCredentials) {
 				t.Fatalf("Login() error = %v, want ErrInvalidCredentials", err)
+			}
+			if verifier.calls != 1 {
+				t.Fatalf(
+					"password comparison count = %d, want 1 to prevent timing enumeration",
+					verifier.calls,
+				)
 			}
 		})
 	}
