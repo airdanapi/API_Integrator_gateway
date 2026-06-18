@@ -13,6 +13,7 @@ pelaporan proyek API Integrator Gateway.
 | [Architecture](architecture/ALUR_KERJA.png) | Diagram alur kerja ekosistem aplikasi. |
 | [Project Management](project-management/GITHUB_PROJECT_ISSUES.md) | Backlog issue, pembagian sprint, dan assignee GitHub Project `RPL 2`. |
 | [Sprint 1 Report](report/SPRINT_01_REPORT.md) | Laporan hasil Project Setup & Infrastructure pada 18 Juni 2026. |
+| [Sprint 2 Report](report/SPRINT_02_REPORT.md) | Laporan landing page, endpoint publik, TDD, dan verifikasi responsif pada 18 Juni 2026. |
 | [Miscellaneous Source Data](misc/source-data/) | Data CSV sumber tugas besar yang dipertahankan sebagai referensi. |
 
 ## Struktur

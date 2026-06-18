@@ -1,7 +1,10 @@
 # API Integrator Gateway
 
-Fondasi API Gateway untuk ekosistem UMKM. Sprint 1 menyediakan proyek React,
-backend Fiber, konfigurasi MySQL, test otomatis, Docker Compose, dan CI.
+Menyediakan spesifikasi produk untuk modul API Integrator yang menjadi pintu masuk semua komunikasi antar aplikasi dalam ekosistem UMKM. API Integrator memastikan routing, keamanan, validasi, logging, dan standarisasi semua request sebelum diteruskan ke SmartBank atau layanan lain.
+
+Sprint 2 menyediakan landing page publik responsif, konten integrasi untuk
+ekosistem UMKM, dan endpoint publik `GET /landing`. Laporan implementasi tersedia
+pada [Sprint 2 Report](docs/report/SPRINT_02_REPORT.md).
 
 ## Kebutuhan
 
@@ -28,6 +31,7 @@ Layanan yang tersedia:
 
 - Frontend: <http://localhost:5173>
 - Backend health check: <http://localhost:8080/health>
+- Backend landing content: <http://localhost:8080/landing>
 - MySQL: `localhost:3306` secara default
 
 Hentikan layanan dengan `docker compose down`. Data MySQL dipertahankan pada
@@ -71,6 +75,20 @@ go run ./cmd/server
 Sprint 1 memvalidasi konfigurasi database, tetapi belum membuat koneksi atau
 schema. Implementasi persistence dijadwalkan pada sprint berikutnya.
 
+## Landing page Sprint 2
+
+Landing page dapat diakses tanpa login dan menyediakan:
+
+- Penjelasan layanan dan manfaat API Integrator.
+- Alur request dari aplikasi menuju gateway dan layanan tujuan.
+- Peran SmartBank, Marketplace, POS, SupplierHub, LogistiKita, UMKM Insight,
+  dan API Gateway.
+- Use case integrasi, FAQ, serta tautan ke repositori.
+- Navigasi responsif dengan dukungan keyboard dan mobile menu.
+
+CTA login sengaja berstatus `Segera hadir`. Autentikasi dan halaman login
+berada di luar scope Sprint 2.
+
 ## Test dan build
 
 Frontend:
@@ -108,7 +126,10 @@ docker compose build
 |   |-- config/              # Environment configuration
 |   `-- internal/server/     # Fiber app factory dan routes
 |-- frontend/
-|   `-- src/                 # React application dan tests
+|   `-- src/
+|       |-- components/      # Komponen landing page
+|       |-- data/            # Konten statis landing page
+|       `-- test/            # Setup pengujian frontend
 |-- docs/
 |   |-- architecture/       # Diagram dan dokumentasi arsitektur
 |   |-- development/        # Panduan teknis pengembangan
@@ -131,6 +152,25 @@ docker compose build
   "data": {
     "service": "api-integrator-gateway",
     "environment": "development"
+  }
+}
+```
+
+## Kontrak landing page
+
+`GET /landing` bersifat publik dan menghasilkan HTTP `200` dengan struktur:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "service_overview": {},
+    "application_roles": [],
+    "integration_flow": [],
+    "contact_info": {
+      "repository_url": "https://github.com/airdanapi/API_Integrator_gateway",
+      "login_status": "coming_soon"
+    }
   }
 }
 ```

@@ -28,6 +28,7 @@ func NewApp(cfg config.Config) *fiber.App {
 			},
 		})
 	})
+	app.Get("/landing", landingHandler)
 
 	return app
 }

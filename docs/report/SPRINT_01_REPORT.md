@@ -196,7 +196,7 @@ Setelah test lulus, struktur dirapikan dengan:
 | Dokumentasi setup lokal | Selesai | Tersedia pada [README proyek](../../README.md). |
 | CI workflow | Selesai | Frontend, backend, dan Docker jobs. |
 | Docker Compose | Selesai | Frontend, backend, dan MySQL dengan healthcheck. |
-| GitHub Issues dan Project | Tertunda | Terhalang izin GitHub MCP dan browser. |
+| GitHub Issues dan Project | Selesai | GitHub project sudah dibuat secara manual. |
 
 ## Acceptance Criteria
 
