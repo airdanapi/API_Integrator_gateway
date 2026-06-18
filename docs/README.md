@@ -10,12 +10,14 @@ pelaporan proyek API Integrator Gateway.
 | [Requirements](requirements/PRD_API_Integrator.md) | Product Requirements Document dan kontrak utama sistem. |
 | [Planning](planning/SPRINT_IMPLEMENTATION_PLAN.md) | Roadmap implementasi untuk Sprint 1 sampai Sprint 12. |
 | [Development](development/DOKUMENTASI_PENGEMBANGAN_APLIKASI.md) | Panduan arsitektur, teknologi, struktur proyek, API, dan pengembangan. |
+| [Database Seeder](development/DATABASE_SEEDER.md) | Panduan penggunaan seeder untuk tabel Sprint 5: request_logs, notifications, chat_messages, dashboard_data. |
 | [Architecture](architecture/ALUR_KERJA.png) | Diagram alur kerja ekosistem aplikasi. |
 | [Project Management](project-management/GITHUB_PROJECT_ISSUES.md) | Backlog issue, pembagian sprint, dan assignee GitHub Project `RPL 2`. |
 | [Sprint 1 Report](report/SPRINT_01_REPORT.md) | Laporan hasil Project Setup & Infrastructure pada 18 Juni 2026. |
 | [Sprint 2 Report](report/SPRINT_02_REPORT.md) | Laporan landing page, endpoint publik, TDD, dan verifikasi responsif pada 18 Juni 2026. |
 | [Sprint 3 Report](report/SPRINT_03_REPORT.md) | Laporan autentikasi backend, JWT, migration MySQL, TDD, dan upgrade Docker pada 18 Juni 2026. |
 | [Sprint 4 Report](report/SPRINT_04_REPORT.md) | Laporan login frontend, session management, protected route, TDD, Docker, dan smoke test pada 18 Juni 2026. |
+| [Sprint 5 Report](report/SPRINT_05_REPORT.md) | Laporan database schema Sprint 5: migrasi, model, repository layer, seeder, dan TDD pada 18 Juni 2026. |
 | [Miscellaneous Source Data](misc/source-data/) | Data CSV sumber tugas besar yang dipertahankan sebagai referensi. |
 
 ## Struktur
