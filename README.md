@@ -2,10 +2,6 @@
 
 Menyediakan spesifikasi produk untuk modul API Integrator yang menjadi pintu masuk semua komunikasi antar aplikasi dalam ekosistem UMKM. API Integrator memastikan routing, keamanan, validasi, logging, dan standarisasi semua request sebelum diteruskan ke SmartBank atau layanan lain.
 
-Sprint 2 menyediakan landing page publik responsif, konten integrasi untuk
-ekosistem UMKM, dan endpoint publik `GET /landing`. Laporan implementasi tersedia
-pada [Sprint 2 Report](docs/report/SPRINT_02_REPORT.md).
-
 ## Kebutuhan
 
 - Docker Desktop dengan Docker Compose v2; atau

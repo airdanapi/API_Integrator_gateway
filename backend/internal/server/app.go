@@ -8,7 +8,12 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/recover"
 )
 
-func NewApp(cfg config.Config) *fiber.App {
+func NewApp(cfg config.Config, providedDependencies ...Dependencies) *fiber.App {
+	var dependencies Dependencies
+	if len(providedDependencies) > 0 {
+		dependencies = providedDependencies[0]
+	}
+
 	app := fiber.New(fiber.Config{
 		AppName: "API Integrator Gateway",
 	})
@@ -29,6 +34,12 @@ func NewApp(cfg config.Config) *fiber.App {
 		})
 	})
 	app.Get("/landing", landingHandler)
+	app.Post("/auth/login", loginHandler(dependencies.AuthService))
+	app.Get(
+		"/auth/me",
+		requireToken(dependencies.TokenVerifier),
+		meHandler,
+	)
 
 	return app
 }

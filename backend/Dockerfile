@@ -1,20 +1,23 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.26-alpine AS build
+FROM golang:1.26.4-alpine3.24 AS build
 
 WORKDIR /src
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build \
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=linux go build \
     -trimpath \
     -ldflags="-s -w" \
     -o /out/server \
     ./cmd/server
 
-FROM alpine:3.23
+FROM alpine:3.24.1
 
 RUN apk add --no-cache ca-certificates \
     && addgroup -S app \

@@ -8,7 +8,7 @@
 | Sprint | Sprint 2 — Landing Page & Static Content |
 | Tanggal laporan | 18 Juni 2026 |
 | PIC | `venalism` |
-| Commit implementasi | Working tree — belum di-commit |
+| Commit implementasi | 93dd9e8 |
 | Status | Selesai |
 
 ## Ringkasan Eksekutif
@@ -302,5 +302,4 @@ Sprint 3 dapat melanjutkan authentication backend dari baseline ini:
 2. Tambahkan schema user, password hashing, JWT service, dan `POST /auth/login`.
 3. Terapkan auth middleware hanya pada endpoint terlindungi.
 4. Pertahankan response JSON yang konsisten dengan endpoint saat ini.
-5. Tambahkan test RED untuk credential validation, token claims, dan protected
-   route sebelum implementasi.
+5. Tambahkan test RED untuk credential validation, token claims, dan protected route sebelum implementasi.
