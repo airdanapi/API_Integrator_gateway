@@ -11,6 +11,7 @@ import (
 
 	"github.com/airdanapi/API_Integrator_gateway/backend/config"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/auth"
+	"github.com/airdanapi/API_Integrator_gateway/backend/internal/dashboard"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/database"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/model"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/repository"
@@ -76,9 +77,14 @@ func main() {
 		time.Now,
 	)
 	authService := auth.NewService(userRepository, passwordHasher, jwtService)
+
+	logRepository := repository.NewMySQLLogRepository(db)
+	dashboardService := dashboard.New(logRepository)
+
 	app := server.NewApp(cfg, server.Dependencies{
-		AuthService:   authService,
-		TokenVerifier: jwtService,
+		AuthService:      authService,
+		TokenVerifier:    jwtService,
+		DashboardService: dashboardService,
 	})
 	serverErrors := make(chan error, 1)
 

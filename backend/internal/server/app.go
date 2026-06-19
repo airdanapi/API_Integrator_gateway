@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/airdanapi/API_Integrator_gateway/backend/config"
+	"github.com/airdanapi/API_Integrator_gateway/backend/internal/model"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/logger"
@@ -41,5 +42,14 @@ func NewApp(cfg config.Config, providedDependencies ...Dependencies) *fiber.App 
 		meHandler,
 	)
 
+	// Dashboard routes — semua memerlukan token valid
+	app.Get(
+		"/dashboard/admin",
+		requireToken(dependencies.TokenVerifier),
+		requireRole(model.RoleAdminGateway),
+		adminDashboardHandler(dependencies.DashboardService),
+	)
+
 	return app
 }
+

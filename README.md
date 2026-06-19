@@ -2,10 +2,6 @@
 
 Menyediakan spesifikasi produk untuk modul API Integrator yang menjadi pintu masuk semua komunikasi antar aplikasi dalam ekosistem UMKM. API Integrator memastikan routing, keamanan, validasi, logging, dan standarisasi semua request sebelum diteruskan ke SmartBank atau layanan lain.
 
-Sprint 4 menyediakan login frontend, session management JWT, route protection,
-dan placeholder dashboard berdasarkan role.
-Laporan implementasi tersedia pada
-[Sprint 4 Report](docs/report/SPRINT_04_REPORT.md).
 
 ## Kebutuhan
 
