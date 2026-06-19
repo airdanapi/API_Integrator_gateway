@@ -188,10 +188,12 @@ function AdminDashboardPage({ apiClient: propApiClient, fetchData = fetchAdminDa
 
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
   const [page, setPage] = useState(1)
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true)
     try {
       const result = await fetchData(client, { page, limit: 20 })
       setData(result)
@@ -200,15 +202,20 @@ function AdminDashboardPage({ apiClient: propApiClient, fetchData = fetchAdminDa
       setError(err)
     } finally {
       setLoading(false)
+      if (isManual) setRefreshing(false)
     }
   }, [fetchData, client, page])
 
   // Initial load + polling setiap 30 detik
   useEffect(() => {
     load()
-    const timer = setInterval(load, POLL_INTERVAL_MS)
+    const timer = setInterval(() => load(false), POLL_INTERVAL_MS)
     return () => clearInterval(timer)
   }, [load])
+
+  function handleRefresh() {
+    load(true)
+  }
 
   function handleLogout() {
     logout()
@@ -256,10 +263,18 @@ function AdminDashboardPage({ apiClient: propApiClient, fetchData = fetchAdminDa
           {!loading && (
             <button
               type="button"
-              onClick={load}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm hover:bg-slate-50"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Refresh
+              {refreshing ? (
+                <>
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
+                  Memperbarui...
+                </>
+              ) : (
+                'Refresh'
+              )}
             </button>
           )}
         </div>
