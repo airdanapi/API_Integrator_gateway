@@ -5,6 +5,13 @@ import App from './App'
 import { AuthProvider } from './auth/AuthContext'
 import { ACCESS_TOKEN_KEY } from './auth/session'
 
+// Mencegah AdminDashboardPage memanggil API sungguhan saat test navigasi App.
+// Tanpa ini, api.get('/dashboard/admin') dipanggil → server mengembalikan 401
+// → token dihapus → user terpaksa logout → heading dashboard tidak ditemukan.
+vi.mock('./services/dashboard', () => ({
+  fetchAdminDashboard: vi.fn(() => new Promise(() => {})), // loading selamanya, heading tetap visible
+}))
+
 const adminUser = {
   user_id: '1',
   username: 'admin',
@@ -218,7 +225,8 @@ describe('Sprint 4 authentication frontend', () => {
     expect(
       await screen.findByRole('heading', { name: 'Dashboard Admin Gateway' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('API Gateway')).toBeInTheDocument()
+    // AdminDashboardPage menampilkan "admin · API Gateway" di satu span
+    expect(screen.getByText(/API Gateway/)).toBeInTheDocument()
     expect(apiClient.get).toHaveBeenCalledWith('/auth/me')
   })
 

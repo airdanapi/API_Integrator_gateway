@@ -19,6 +19,7 @@ pelaporan proyek API Integrator Gateway.
 | [Sprint 4 Report](report/SPRINT_04_REPORT.md) | Laporan login frontend, session management, protected route, TDD, Docker, dan smoke test pada 18 Juni 2026. |
 | [Sprint 5 Report](report/SPRINT_05_REPORT.md) | Laporan database schema Sprint 5: migrasi, model, repository layer, seeder, dan TDD pada 18 Juni 2026. |
 | [Sprint 6 Report](report/SPRINT_06_REPORT.md) | Laporan Dashboard Admin backend: endpoint GET /dashboard/admin, requireRole middleware, service layer, TDD pada 19 Juni 2026. |
+| [Sprint 7 Report](report/SPRINT_07_REPORT.md) | Laporan Dashboard Admin frontend: AdminDashboardPage, traffic cards, service indicators, audit table, polling 30s, fix jsdom 28 pada 19 Juni 2026. |
 | [Miscellaneous Source Data](misc/source-data/) | Data CSV sumber tugas besar yang dipertahankan sebagai referensi. |
 
 ## Struktur

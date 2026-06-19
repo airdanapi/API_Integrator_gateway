@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './auth/ProtectedRoute'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 import DashboardPage from './pages/DashboardPage'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -11,7 +12,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
 
       <Route element={<ProtectedRoute role="admin_gateway" />}>
-        <Route path="/dashboard/admin" element={<DashboardPage />} />
+        <Route path="/dashboard/admin" element={<AdminDashboardPage />} />
       </Route>
       <Route element={<ProtectedRoute role="app_user" />}>
         <Route path="/dashboard/user" element={<DashboardPage />} />
