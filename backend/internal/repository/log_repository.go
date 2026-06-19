@@ -15,6 +15,7 @@ type LogRepository interface {
 	ListBySourceApp(ctx context.Context, sourceApp string, limit, offset int) ([]model.RequestLog, error)
 	ListRecent(ctx context.Context, limit, offset int) ([]model.RequestLog, error)
 	CountByStatus(ctx context.Context, since time.Time) (map[int]int64, error)
+	CountByStatusForApp(ctx context.Context, appName string, since time.Time) (map[int]int64, error)
 	CountBySourceApp(ctx context.Context, since time.Time) (map[string]int64, error)
 }
 
@@ -101,6 +102,29 @@ func (r *MySQLLogRepository) CountByStatus(ctx context.Context, since time.Time)
 		var count int64
 		if err := rows.Scan(&status, &count); err != nil {
 			return nil, fmt.Errorf("scan status count row: %w", err)
+		}
+		result[status] = count
+	}
+	return result, rows.Err()
+}
+
+// CountByStatusForApp menghitung jumlah log per HTTP status code untuk satu aplikasi sejak waktu tertentu.
+func (r *MySQLLogRepository) CountByStatusForApp(ctx context.Context, appName string, since time.Time) (map[int]int64, error) {
+	rows, err := r.db.QueryContext(
+		ctx,
+		`SELECT status, COUNT(*) FROM request_logs WHERE source_app = ? AND timestamp >= ? GROUP BY status`,
+		appName, since,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("count request logs by status for app: %w", err)
+	}
+	defer rows.Close()
+	result := make(map[int]int64)
+	for rows.Next() {
+		var status int
+		var count int64
+		if err := rows.Scan(&status, &count); err != nil {
+			return nil, fmt.Errorf("scan status for app count row: %w", err)
 		}
 		result[status] = count
 	}

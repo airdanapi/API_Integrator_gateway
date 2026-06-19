@@ -49,6 +49,18 @@ func NewApp(cfg config.Config, providedDependencies ...Dependencies) *fiber.App 
 		requireRole(model.RoleAdminGateway),
 		adminDashboardHandler(dependencies.DashboardService),
 	)
+	app.Get(
+		"/dashboard/user",
+		requireToken(dependencies.TokenVerifier),
+		requireRole(model.RoleAppUser),
+		userDashboardHandler(dependencies.DashboardService),
+	)
+	app.Get(
+		"/dashboard/monitoring",
+		requireToken(dependencies.TokenVerifier),
+		requireRole(model.RoleMonitoringUser),
+		monitoringDashboardHandler(dependencies.DashboardService),
+	)
 
 	return app
 }

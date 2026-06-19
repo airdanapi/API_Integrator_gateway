@@ -1,7 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './auth/ProtectedRoute'
 import AdminDashboardPage from './pages/AdminDashboardPage'
-import DashboardPage from './pages/DashboardPage'
+import UserDashboardPage from './pages/UserDashboardPage'
+import MonitoringDashboardPage from './pages/MonitoringDashboardPage'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 
@@ -15,10 +16,10 @@ function App() {
         <Route path="/dashboard/admin" element={<AdminDashboardPage />} />
       </Route>
       <Route element={<ProtectedRoute role="app_user" />}>
-        <Route path="/dashboard/user" element={<DashboardPage />} />
+        <Route path="/dashboard/user" element={<UserDashboardPage />} />
       </Route>
       <Route element={<ProtectedRoute role="monitoring_user" />}>
-        <Route path="/dashboard/monitoring" element={<DashboardPage />} />
+        <Route path="/dashboard/monitoring" element={<MonitoringDashboardPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

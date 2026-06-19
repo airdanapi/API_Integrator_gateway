@@ -12,9 +12,10 @@ import (
 // ─── stub LogQuerier ────────────────────────────────────────────────────────
 
 type stubLogQuerier struct {
-	byStatus map[int]int64
-	byApp    map[string]int64
-	logs     []model.RequestLog
+	byStatus      map[int]int64
+	byStatusForApp map[int]int64 // returned by CountByStatusForApp
+	byApp         map[string]int64
+	logs          []model.RequestLog
 }
 
 func (s *stubLogQuerier) ListRecent(_ context.Context, limit, offset int) ([]model.RequestLog, error) {
@@ -28,7 +29,25 @@ func (s *stubLogQuerier) ListRecent(_ context.Context, limit, offset int) ([]mod
 	return s.logs[offset:end], nil
 }
 
+func (s *stubLogQuerier) ListBySourceApp(_ context.Context, _ string, limit, offset int) ([]model.RequestLog, error) {
+	end := offset + limit
+	if end > len(s.logs) {
+		end = len(s.logs)
+	}
+	if offset >= len(s.logs) {
+		return nil, nil
+	}
+	return s.logs[offset:end], nil
+}
+
 func (s *stubLogQuerier) CountByStatus(_ context.Context, _ time.Time) (map[int]int64, error) {
+	return s.byStatus, nil
+}
+
+func (s *stubLogQuerier) CountByStatusForApp(_ context.Context, _ string, _ time.Time) (map[int]int64, error) {
+	if s.byStatusForApp != nil {
+		return s.byStatusForApp, nil
+	}
 	return s.byStatus, nil
 }
 
@@ -170,5 +189,117 @@ func TestGetAuditLogs_PaginatesCorrectly(t *testing.T) {
 	}
 	if entries[1].DurationMS != nil {
 		t.Errorf("entries[1].DurationMS should be nil")
+	}
+}
+
+// ─── GetUserDashboard ────────────────────────────────────────────────────────
+
+func TestGetUserDashboard_ActiveApp(t *testing.T) {
+	now := time.Now().UTC()
+	dur := 120
+	logs := []model.RequestLog{
+		{ID: 10, SourceApp: "Marketplace", Endpoint: "/gateway/payment", Method: "POST", Status: 200, Timestamp: now, DurationMS: &dur},
+		{ID: 11, SourceApp: "Marketplace", Endpoint: "/gateway/payment", Method: "POST", Status: 400, Timestamp: now},
+	}
+	querier := &stubLogQuerier{
+		byStatusForApp: map[int]int64{200: 10, 400: 2}, // recent counts
+		byStatus:       map[int]int64{200: 10, 400: 2}, // fallback / all-time
+		logs:           logs,
+	}
+	svc := dashboard.New(querier)
+	result, err := svc.GetUserDashboard(context.Background(), "Marketplace", 1, 20)
+	if err != nil {
+		t.Fatalf("GetUserDashboard() error: %v", err)
+	}
+	if result.MyApp != "Marketplace" {
+		t.Errorf("MyApp = %q, want Marketplace", result.MyApp)
+	}
+	if result.ServiceStatus != "active" {
+		t.Errorf("ServiceStatus = %q, want active", result.ServiceStatus)
+	}
+	if result.TrafficSummary.TotalRequests != 12 {
+		t.Errorf("TotalRequests = %d, want 12", result.TrafficSummary.TotalRequests)
+	}
+	if result.TrafficSummary.SuccessCount != 10 {
+		t.Errorf("SuccessCount = %d, want 10", result.TrafficSummary.SuccessCount)
+	}
+	if result.Page != 1 {
+		t.Errorf("Page = %d, want 1", result.Page)
+	}
+	if result.Limit != 20 {
+		t.Errorf("Limit = %d, want 20", result.Limit)
+	}
+	if len(result.RecentLogs) != 2 {
+		t.Errorf("RecentLogs count = %d, want 2", len(result.RecentLogs))
+	}
+}
+
+func TestGetUserDashboard_InactiveApp(t *testing.T) {
+	querier := &stubLogQuerier{
+		byStatusForApp: map[int]int64{}, // no recent requests
+		byStatus:       map[int]int64{},
+		logs:           nil,
+	}
+	svc := dashboard.New(querier)
+	result, err := svc.GetUserDashboard(context.Background(), "LogistiKita", 1, 20)
+	if err != nil {
+		t.Fatalf("GetUserDashboard() error: %v", err)
+	}
+	if result.ServiceStatus != "inactive" {
+		t.Errorf("ServiceStatus = %q, want inactive", result.ServiceStatus)
+	}
+	if result.TrafficSummary.TotalRequests != 0 {
+		t.Errorf("TotalRequests = %d, want 0", result.TrafficSummary.TotalRequests)
+	}
+	if len(result.RecentLogs) != 0 {
+		t.Errorf("RecentLogs should be empty")
+	}
+}
+
+// ─── GetMonitoringDashboard ──────────────────────────────────────────────────
+
+func TestGetMonitoringDashboard_ReturnsAllComponents(t *testing.T) {
+	querier := &stubLogQuerier{
+		byStatus: map[int]int64{200: 50, 400: 10, 500: 5},
+		byApp: map[string]int64{
+			"Marketplace": 20,
+			"POS":         15,
+			"SupplierHub": 10,
+			"LogistiKita": 8,
+			"SmartBank":   12,
+		},
+	}
+	svc := dashboard.New(querier)
+	result, err := svc.GetMonitoringDashboard(context.Background())
+	if err != nil {
+		t.Fatalf("GetMonitoringDashboard() error: %v", err)
+	}
+
+	// Traffic summary overall
+	if result.TrafficSummary.TotalRequests != 65 {
+		t.Errorf("TotalRequests = %d, want 65", result.TrafficSummary.TotalRequests)
+	}
+	if result.TrafficSummary.SuccessCount != 50 {
+		t.Errorf("SuccessCount = %d, want 50", result.TrafficSummary.SuccessCount)
+	}
+
+	// Service indicators: semua 5 app harus muncul
+	if len(result.ServiceIndicators) != 5 {
+		t.Errorf("ServiceIndicators count = %d, want 5", len(result.ServiceIndicators))
+	}
+
+	// App breakdown: semua 5 known apps harus ada
+	if len(result.AppBreakdown) != 5 {
+		t.Fatalf("AppBreakdown count = %d, want 5", len(result.AppBreakdown))
+	}
+	byName := make(map[string]dashboard.AppStat)
+	for _, stat := range result.AppBreakdown {
+		byName[stat.AppName] = stat
+	}
+	if byName["Marketplace"].TotalRequests != 20 {
+		t.Errorf("Marketplace total = %d, want 20", byName["Marketplace"].TotalRequests)
+	}
+	if byName["SmartBank"].TotalRequests != 12 {
+		t.Errorf("SmartBank total = %d, want 12", byName["SmartBank"].TotalRequests)
 	}
 }

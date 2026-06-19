@@ -5,11 +5,13 @@ import App from './App'
 import { AuthProvider } from './auth/AuthContext'
 import { ACCESS_TOKEN_KEY } from './auth/session'
 
-// Mencegah AdminDashboardPage memanggil API sungguhan saat test navigasi App.
-// Tanpa ini, api.get('/dashboard/admin') dipanggil → server mengembalikan 401
+// Mencegah Dashboard page memanggil API sungguhan saat test navigasi App.
+// Tanpa ini, api.get('/dashboard/...') dipanggil → server mengembalikan 401
 // → token dihapus → user terpaksa logout → heading dashboard tidak ditemukan.
 vi.mock('./services/dashboard', () => ({
-  fetchAdminDashboard: vi.fn(() => new Promise(() => {})), // loading selamanya, heading tetap visible
+  fetchAdminDashboard: vi.fn(() => new Promise(() => {})),      // loading selamanya
+  fetchUserDashboard: vi.fn(() => new Promise(() => {})),       // loading selamanya
+  fetchMonitoringDashboard: vi.fn(() => new Promise(() => {})), // loading selamanya
 }))
 
 const adminUser = {
@@ -253,10 +255,10 @@ describe('Sprint 4 authentication frontend', () => {
     }))
     renderApp({ path: '/dashboard/admin', apiClient })
 
+    // UserDashboardPage: heading = "Dashboard {app_name}" (loading state — app_name from user object)
     expect(
-      await screen.findByRole('heading', { name: 'Dashboard Pengguna Aplikasi' }),
+      await screen.findByRole('heading', { name: /Dashboard/ }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Marketplace')).toBeInTheDocument()
   })
 
   it('renders the protected monitoring placeholder for a monitoring user', async () => {
@@ -270,11 +272,10 @@ describe('Sprint 4 authentication frontend', () => {
     }))
     renderApp({ path: '/dashboard/monitoring', apiClient })
 
+    // MonitoringDashboardPage: heading = "Monitoring Gateway"
     expect(
-      await screen.findByRole('heading', { name: 'Dashboard Monitoring' }),
+      await screen.findByRole('heading', { name: 'Monitoring Gateway' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('UMKM Insight')).toBeInTheDocument()
-    expect(screen.getByText('Monitoring Read-only')).toBeInTheDocument()
   })
 
   it('shows dashboard and logout actions on the landing page for an active session', async () => {

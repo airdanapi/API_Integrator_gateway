@@ -122,3 +122,35 @@ func TestLogRepository_CountByStatus(t *testing.T) {
 		t.Errorf("unmet mock expectations: %v", err)
 	}
 }
+
+func TestLogRepository_CountByStatusForApp(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New: %v", err)
+	}
+	defer db.Close()
+
+	since := time.Now().Add(-7 * 24 * time.Hour).UTC()
+	rows := sqlmock.NewRows([]string{"status", "count"}).
+		AddRow(200, 12).
+		AddRow(500, 3)
+
+	mock.ExpectQuery(`SELECT status, COUNT\(\*\) FROM request_logs WHERE source_app = \? AND timestamp >= \? GROUP BY status`).
+		WithArgs("Marketplace", sqlmock.AnyArg()).
+		WillReturnRows(rows)
+
+	repo := NewMySQLLogRepository(db)
+	counts, err := repo.CountByStatusForApp(context.Background(), "Marketplace", since)
+	if err != nil {
+		t.Fatalf("CountByStatusForApp() error: %v", err)
+	}
+	if counts[200] != 12 {
+		t.Errorf("counts[200] = %d, want 12", counts[200])
+	}
+	if counts[500] != 3 {
+		t.Errorf("counts[500] = %d, want 3", counts[500])
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("unmet mock expectations: %v", err)
+	}
+}
