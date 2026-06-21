@@ -4,6 +4,7 @@ import { useAuth } from '../auth/auth-context'
 import { api } from '../services/api'
 import { fetchUserDashboard } from '../services/dashboard'
 import NotificationBell from '../components/NotificationBell'
+import ChatDrawer from '../components/ChatDrawer'
 
 const POLL_INTERVAL_MS = 30_000
 
@@ -214,6 +215,7 @@ function UserDashboardPage({ apiClient: propApiClient, fetchData = fetchUserDash
               {user?.username} · {user?.app_name}
             </span>
             <NotificationBell apiClient={client} />
+            <ChatDrawer apiClient={client} currentUser={user} />
             <button
               type="button"
               onClick={handleLogout}

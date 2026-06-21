@@ -14,6 +14,9 @@ vi.mock('../auth/auth-context', () => ({
 vi.mock('../components/NotificationBell', () => ({
   default: () => <button type="button">Notifikasi</button>,
 }))
+vi.mock('../components/ChatDrawer', () => ({
+  default: () => <button type="button">Chat</button>,
+}))
 function renderPage(fetchData) {
   return render(
     <MemoryRouter>
@@ -136,4 +139,9 @@ describe('UserDashboardPage', () => {
       expect.objectContaining({ page: 1, limit: 20 })
     )
   })
-})
+  it('shows chat drawer trigger in the header', async () => {
+    const fetchData = vi.fn().mockResolvedValue(mockData)
+    renderPage(fetchData)
+
+    expect(await screen.findByRole('button', { name: 'Chat' })).toBeInTheDocument()
+  })})

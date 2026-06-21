@@ -90,3 +90,59 @@ func TestMySQLUserRepositoryUpsertsByUsernameAndApp(t *testing.T) {
 		t.Fatalf("unmet SQL expectations: %v", err)
 	}
 }
+
+func TestMySQLUserRepositoryListByRole(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New(): %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT id, username, password_hash, role, app_name FROM users WHERE role = ? ORDER BY app_name ASC, username ASC",
+	)).
+		WithArgs(model.RoleAppUser).
+		WillReturnRows(sqlmock.NewRows(
+			[]string{"id", "username", "password_hash", "role", "app_name"},
+		).AddRow(2, "marketplace", "hash", "app_user", "Marketplace"))
+
+	repo := NewMySQLUserRepository(db)
+	users, err := repo.ListByRole(context.Background(), model.RoleAppUser)
+	if err != nil {
+		t.Fatalf("ListByRole() returned an unexpected error: %v", err)
+	}
+	if len(users) != 1 || users[0].Username != "marketplace" || users[0].AppName != "Marketplace" {
+		t.Fatalf("unexpected users: %#v", users)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("unmet SQL expectations: %v", err)
+	}
+}
+
+func TestMySQLUserRepositoryFindFirstByRole(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New(): %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery(regexp.QuoteMeta(
+		"SELECT id, username, password_hash, role, app_name FROM users WHERE role = ? ORDER BY id ASC LIMIT 1",
+	)).
+		WithArgs(model.RoleAdminGateway).
+		WillReturnRows(sqlmock.NewRows(
+			[]string{"id", "username", "password_hash", "role", "app_name"},
+		).AddRow(1, "admin", "hash", "admin_gateway", "API Gateway"))
+
+	repo := NewMySQLUserRepository(db)
+	user, err := repo.FindFirstByRole(context.Background(), model.RoleAdminGateway)
+	if err != nil {
+		t.Fatalf("FindFirstByRole() returned an unexpected error: %v", err)
+	}
+	if user.Username != "admin" || user.Role != model.RoleAdminGateway {
+		t.Fatalf("unexpected user: %#v", user)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("unmet SQL expectations: %v", err)
+	}
+}

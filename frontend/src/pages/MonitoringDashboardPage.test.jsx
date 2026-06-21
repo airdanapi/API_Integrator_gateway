@@ -119,4 +119,10 @@ describe('MonitoringDashboardPage', () => {
     await waitForDataLoaded()
     expect(fetchData).toHaveBeenCalledTimes(1)
   })
-})
+  it('does not show chat drawer for monitoring users', async () => {
+    const fetchData = vi.fn().mockResolvedValue(mockData)
+    renderPage(fetchData)
+    await waitForDataLoaded()
+
+    expect(screen.queryByRole('button', { name: 'Chat' })).not.toBeInTheDocument()
+  })})

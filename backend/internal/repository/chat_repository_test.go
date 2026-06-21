@@ -108,3 +108,104 @@ func TestChatRepository_ListByConversation(t *testing.T) {
 		t.Errorf("unmet mock expectations: %v", err)
 	}
 }
+
+func TestChatRepository_LatestByConversation(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New: %v", err)
+	}
+	defer db.Close()
+
+	ts := time.Now().UTC()
+	rows := sqlmock.NewRows([]string{"id", "conversation_id", "from_user", "to_user", "message", "timestamp", "is_read"}).
+		AddRow(3, "admin__marketplace__Marketplace", "admin", "marketplace", "Latest", ts, 0)
+	mock.ExpectQuery(`SELECT id, conversation_id, from_user, to_user, message, timestamp, is_read FROM chat_messages WHERE conversation_id = \?`).
+		WithArgs("admin__marketplace__Marketplace").
+		WillReturnRows(rows)
+
+	repo := NewMySQLChatRepository(db)
+	msg, err := repo.LatestByConversation(context.Background(), "admin__marketplace__Marketplace")
+	if err != nil {
+		t.Fatalf("LatestByConversation() error: %v", err)
+	}
+	if msg.ID != 3 || msg.Message != "Latest" {
+		t.Fatalf("LatestByConversation() = %#v", msg)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("unmet mock expectations: %v", err)
+	}
+}
+
+func TestChatRepository_CountUnreadByConversation(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New: %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery(`SELECT COUNT\(\*\) FROM chat_messages WHERE conversation_id = \? AND to_user = \? AND is_read = 0`).
+		WithArgs("admin__marketplace__Marketplace", "marketplace").
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(4))
+
+	repo := NewMySQLChatRepository(db)
+	count, err := repo.CountUnreadByConversation(context.Background(), "admin__marketplace__Marketplace", "marketplace")
+	if err != nil {
+		t.Fatalf("CountUnreadByConversation() error: %v", err)
+	}
+	if count != 4 {
+		t.Fatalf("CountUnreadByConversation() = %d, want 4", count)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("unmet mock expectations: %v", err)
+	}
+}
+
+func TestChatRepository_MarkAsRead(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New: %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectExec(`UPDATE chat_messages SET is_read = 1 WHERE conversation_id = \? AND to_user = \? AND is_read = 0`).
+		WithArgs("admin__marketplace__Marketplace", "marketplace").
+		WillReturnResult(sqlmock.NewResult(0, 3))
+
+	repo := NewMySQLChatRepository(db)
+	err = repo.MarkAsRead(context.Background(), "admin__marketplace__Marketplace", "marketplace")
+	if err != nil {
+		t.Fatalf("MarkAsRead() error: %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("unmet mock expectations: %v", err)
+	}
+}
+
+func TestChatRepository_ListConversations(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New: %v", err)
+	}
+	defer db.Close()
+
+	mock.ExpectQuery(`SELECT conversation_id FROM chat_messages WHERE from_user = \? OR to_user = \? GROUP BY conversation_id ORDER BY MAX\(timestamp\) DESC`).
+		WithArgs("admin", "admin").
+		WillReturnRows(sqlmock.NewRows([]string{"conversation_id"}).
+			AddRow("admin__marketplace__Marketplace").
+			AddRow("admin__pos__POS"))
+
+	repo := NewMySQLChatRepository(db)
+	ids, err := repo.ListConversations(context.Background(), "admin")
+	if err != nil {
+		t.Fatalf("ListConversations() error: %v", err)
+	}
+	if len(ids) != 2 {
+		t.Fatalf("ListConversations() count = %d, want 2", len(ids))
+	}
+	if ids[0] != "admin__marketplace__Marketplace" || ids[1] != "admin__pos__POS" {
+		t.Errorf("ListConversations() = %#v", ids)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("unmet mock expectations: %v", err)
+	}
+}

@@ -11,6 +11,9 @@ import { ACCESS_TOKEN_KEY } from './auth/session'
 vi.mock('./components/NotificationBell', () => ({
   default: () => <button type="button">Notifikasi</button>,
 }))
+vi.mock('./components/ChatDrawer', () => ({
+  default: () => <button type="button">Chat</button>,
+}))
 vi.mock('./services/dashboard', () => ({
   fetchAdminDashboard: vi.fn(() => new Promise(() => {})),      // loading selamanya
   fetchUserDashboard: vi.fn(() => new Promise(() => {})),       // loading selamanya

@@ -46,6 +46,9 @@ const sampleData = {
 vi.mock('../components/NotificationBell', () => ({
   default: () => <button type="button">Notifikasi</button>,
 }))
+vi.mock('../components/ChatDrawer', () => ({
+  default: () => <button type="button">Chat</button>,
+}))
 function renderPage(fetchData) {
   return render(
     <MemoryRouter>
@@ -138,4 +141,9 @@ describe('AdminDashboardPage', () => {
       { page: 1, limit: 20 },
     )
   })
-})
+  it('shows chat drawer trigger in the header', async () => {
+    const mockFetch = vi.fn().mockResolvedValue(sampleData)
+    renderPage(mockFetch)
+
+    expect(await screen.findByRole('button', { name: 'Chat' })).toBeInTheDocument()
+  })})

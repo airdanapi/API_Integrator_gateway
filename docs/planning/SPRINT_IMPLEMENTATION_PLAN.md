@@ -275,6 +275,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 
 ## Sprint 10: Chat System
 **Duration:** Week 10  
+**Status:** Selesai pada 21 Juni 2026  
 **Goal:** Implementasi fitur chat untuk komunikasi admin-user.
 
 ### Tasks (Backend)
@@ -409,7 +410,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 | 7 | 7 | Dashboard Admin Frontend | Planning |
 | 8 | 8 | Dashboard User & Monitoring | Planning |
 | 9 | 9 | Notifications | Selesai |
-| 10 | 10 | Chat System | Planning |
+| 10 | 10 | Chat System | Selesai |
 | 11 | 11 | Gateway & Integration | Planning |
 | 12 | 12 | Testing & Deployment | Planning |
 

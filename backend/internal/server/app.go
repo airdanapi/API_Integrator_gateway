@@ -73,5 +73,27 @@ func NewApp(cfg config.Config, providedDependencies ...Dependencies) *fiber.App 
 		notificationReadHandler(dependencies.NotificationService),
 	)
 
+	// Chat routes - semua memerlukan token valid.
+	app.Get(
+		"/chat/conversations",
+		requireToken(dependencies.TokenVerifier),
+		chatConversationsHandler(dependencies.ChatService),
+	)
+	app.Get(
+		"/chat/history",
+		requireToken(dependencies.TokenVerifier),
+		chatHistoryHandler(dependencies.ChatService),
+	)
+	app.Post(
+		"/chat/message",
+		requireToken(dependencies.TokenVerifier),
+		chatMessageHandler(dependencies.ChatService),
+	)
+	app.Post(
+		"/chat/read",
+		requireToken(dependencies.TokenVerifier),
+		chatReadHandler(dependencies.ChatService),
+	)
+
 	return app
 }

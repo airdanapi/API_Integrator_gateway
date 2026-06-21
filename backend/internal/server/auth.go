@@ -23,6 +23,7 @@ type Dependencies struct {
 	TokenVerifier       TokenVerifier
 	DashboardService    DashboardService
 	NotificationService NotificationService
+	ChatService         ChatService
 }
 
 func loginHandler(service LoginService) fiber.Handler {
