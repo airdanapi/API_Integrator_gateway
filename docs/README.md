@@ -24,6 +24,7 @@ pelaporan proyek API Integrator Gateway.
 | [Pre-Sprint 9 Hardening](report/PRE_SPRINT_09_HARDENING.md) | Catatan baseline hardening frontend sebelum Sprint 9 Notifications: lint, stabilitas Vitest, build, backend regression, dan smoke test pada 21 Juni 2026. |
 | [Sprint 9 Report](report/SPRINT_09_REPORT.md) | Laporan Notifications System: backend notification API, scheduler alert, frontend bell/dropdown, mark-read, TDD, Docker checklist, dan smoke test pada 21 Juni 2026. |
 | [Sprint 10 Report](report/SPRINT_10_REPORT.md) | Laporan Chat System: backend chat API, service, repository, frontend ChatDrawer, polling 2s, RBAC, TDD, dan verifikasi pada 21 Juni 2026. |
+| [Sprint 11 Report](report/SPRINT_11_REPORT.md) | Laporan Gateway Routing & API Integration: endpoint gateway, forwarder HTTP, validasi payload, request logging, frontend service, TDD, Docker checklist, dan smoke test pada 21 Juni 2026. |
 | [Miscellaneous Source Data](misc/source-data/) | Data CSV sumber tugas besar yang dipertahankan sebagai referensi. |
 
 ## Struktur

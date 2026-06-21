@@ -38,6 +38,10 @@ type Config struct {
 	AdminSeed          SeedUserConfig
 	AppUserSeed        SeedUserConfig
 	MonitoringUserSeed SeedUserConfig
+	GatewaySmartBankURL   string
+	GatewayMarketplaceURL string
+	GatewayLogisticsURL   string
+	GatewaySupplierHubURL string
 }
 
 func Load() (Config, error) {
@@ -71,6 +75,10 @@ func Load() (Config, error) {
 			Password: os.Getenv("SEED_MONITORING_PASSWORD"),
 			AppName:  "UMKM Insight",
 		},
+		GatewaySmartBankURL:   strings.TrimSpace(os.Getenv("GATEWAY_SMARTBANK_URL")),
+		GatewayMarketplaceURL: strings.TrimSpace(os.Getenv("GATEWAY_MARKETPLACE_URL")),
+		GatewayLogisticsURL:   strings.TrimSpace(os.Getenv("GATEWAY_LOGISTICS_URL")),
+		GatewaySupplierHubURL: strings.TrimSpace(os.Getenv("GATEWAY_SUPPLIERHUB_URL")),
 	}
 
 	validationErrors := make([]string, 0, 8)

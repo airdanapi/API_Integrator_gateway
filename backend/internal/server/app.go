@@ -95,5 +95,32 @@ func NewApp(cfg config.Config, providedDependencies ...Dependencies) *fiber.App 
 		chatReadHandler(dependencies.ChatService),
 	)
 
+	// Gateway routes - memerlukan token valid.
+	app.Post(
+		"/gateway/payment",
+		requireToken(dependencies.TokenVerifier),
+		gatewayPaymentHandler(dependencies.GatewayService),
+	)
+	app.Post(
+		"/gateway/smartbank",
+		requireToken(dependencies.TokenVerifier),
+		gatewaySmartBankHandler(dependencies.GatewayService),
+	)
+	app.Post(
+		"/gateway/marketplace",
+		requireToken(dependencies.TokenVerifier),
+		gatewayMarketplaceHandler(dependencies.GatewayService),
+	)
+	app.Post(
+		"/gateway/logistics",
+		requireToken(dependencies.TokenVerifier),
+		gatewayLogisticsHandler(dependencies.GatewayService),
+	)
+	app.Post(
+		"/gateway/supplier",
+		requireToken(dependencies.TokenVerifier),
+		gatewaySupplierHandler(dependencies.GatewayService),
+	)
+
 	return app
 }

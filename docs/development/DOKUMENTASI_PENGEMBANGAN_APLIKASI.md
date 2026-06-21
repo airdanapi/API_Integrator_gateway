@@ -305,27 +305,32 @@ func JWTProtected(c *fiber.Ctx) error {
   - Output: `{ messages }`
 
 #### Gateway
+
+Semua endpoint gateway bersifat protected dengan JWT Bearer token. Role `admin_gateway` dan `app_user` boleh mengakses gateway; `monitoring_user` ditolak dengan `403 forbidden`. Upstream dikonfigurasi lewat `GATEWAY_SMARTBANK_URL`, `GATEWAY_MARKETPLACE_URL`, `GATEWAY_LOGISTICS_URL`, dan `GATEWAY_SUPPLIERHUB_URL`. Jika URL kosong, request valid diterima untuk development mode dengan `forwarded=false` dan `upstream=not_configured`.
+
 - `POST /gateway/payment`
   - Input: `{ from_app, from_user, to_user, amount, metadata, service_type }`
-  - Output: `{ status, transaction_id, message }`
+  - Output: `{ status, data: { status, transaction_id, message, forwarded, upstream, data } }`
 - `POST /gateway/smartbank`
   - Input: `{ action, payload }`
-  - Output: `{ status, data }`
+  - Output: `{ status, data: { status, message, forwarded, upstream, data } }`
 - `POST /gateway/marketplace`
   - Input: `{ action, payload }`
-  - Output: `{ status, data }`
+  - Output: `{ status, data: { status, message, forwarded, upstream, data } }`
 - `POST /gateway/logistics`
   - Input: `{ order_id, address, distance, shipping_type }`
-  - Output: `{ status, delivery_id, message }`
+  - Output: `{ status, data: { status, transaction_id, delivery_id, message, forwarded, upstream, data } }`
 - `POST /gateway/supplier`
   - Input: `{ supplier_id, material, qty, total_cost }`
-  - Output: `{ status, order_id, message }`
+  - Output: `{ status, data: { status, transaction_id, order_id, message, forwarded, upstream, data } }`
 
 ### 7.6 API Contract
 - Semua response sukses harus menggunakan format JSON dengan properti `status` dan `data`.
 - `400 Bad Request` untuk payload atau validasi yang salah.
 - `401 Unauthorized` untuk token tidak valid atau tidak ada.
 - `500 Internal Server Error` untuk kegagalan internal.
+- `502 Bad Gateway` untuk kegagalan upstream gateway.
+- Gateway menulis request valid ke `request_logs` agar dashboard dan audit trail tetap sinkron.
 - Admin memiliki akses ke `/dashboard/admin` dan semua log.
 - `app_user` memiliki akses ke `/dashboard/user` dan endpoint gateway sesuai peran aplikasi.
 - `monitoring_user` hanya memiliki akses read-only ke `/dashboard/monitoring` dan tidak dapat memanggil endpoint transaksi.

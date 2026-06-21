@@ -34,6 +34,11 @@ Layanan yang tersedia:
 - Backend current user: `GET http://localhost:8080/auth/me`
 - Backend notifications: `GET http://localhost:8080/notifications`
 - Backend mark notifications read: `POST http://localhost:8080/notifications/read`
+- Backend gateway payment: `POST http://localhost:8080/gateway/payment`
+- Backend gateway SmartBank: `POST http://localhost:8080/gateway/smartbank`
+- Backend gateway Marketplace: `POST http://localhost:8080/gateway/marketplace`
+- Backend gateway LogistiKita: `POST http://localhost:8080/gateway/logistics`
+- Backend gateway SupplierHub: `POST http://localhost:8080/gateway/supplier`
 - MySQL: `localhost:3306` secara default
 
 Hentikan layanan dengan `docker compose down`. Data MySQL dipertahankan pada
@@ -75,6 +80,10 @@ $env:JWT_SECRET = "minimum-32-character-secret-change-this"
 $env:JWT_TTL = "1h"
 $env:JWT_ISSUER = "api-integrator-gateway"
 $env:SEED_USERS_ENABLED = "false"
+$env:GATEWAY_SMARTBANK_URL = ""
+$env:GATEWAY_MARKETPLACE_URL = ""
+$env:GATEWAY_LOGISTICS_URL = ""
+$env:GATEWAY_SUPPLIERHUB_URL = ""
 
 Set-Location backend
 go run ./cmd/server
@@ -214,6 +223,21 @@ Response sukses:
 ```
 
 Backend scheduler membuat alert saat startup lalu setiap 5 menit untuk `api_inactive`, `error_rate`, dan `response_time`. Alert didedup berdasarkan `app_name + type` selama 24 jam.
+## Gateway routing Sprint 11
+
+Endpoint gateway memakai JWT Bearer token dan mencatat setiap request valid ke table `request_logs`. Role `admin_gateway` dan `app_user` dapat memanggil endpoint gateway; `monitoring_user` mendapat `403 forbidden`.
+
+Upstream service dikonfigurasi lewat `GATEWAY_SMARTBANK_URL`, `GATEWAY_MARKETPLACE_URL`, `GATEWAY_LOGISTICS_URL`, dan `GATEWAY_SUPPLIERHUB_URL`. Nilai kosong berarti request diterima untuk development smoke test, tetapi tidak diteruskan keluar (`forwarded=false`, `upstream=not_configured`).
+
+Endpoint yang tersedia:
+
+- `POST /gateway/payment` dengan body `{ from_app, from_user, to_user, amount, metadata, service_type }`.
+- `POST /gateway/smartbank` dengan body `{ action, payload }`.
+- `POST /gateway/marketplace` dengan body `{ action, payload }`.
+- `POST /gateway/logistics` dengan body `{ order_id, address, distance, shipping_type }`.
+- `POST /gateway/supplier` dengan body `{ supplier_id, material, qty, total_cost }`.
+
+Response sukses selalu dibungkus sebagai `{ "status": "success", "data": { ... } }`. Payload tidak valid menghasilkan `400`, token tidak ada menghasilkan `401`, role tidak sesuai menghasilkan `403`, dan kegagalan upstream menghasilkan `502`.
 ## Test dan build
 
 Frontend:
@@ -254,6 +278,7 @@ docker compose ps
 |   |-- config/              # Environment configuration
 |   `-- internal/
 |       |-- auth/            # Bcrypt, JWT, login service, dan seed
+|       |-- gateway/         # Gateway routing, validation, forwarder, dan logging
 |       |-- notification/    # Service notifikasi, alert generator, dan scheduler
 |       |-- database/        # Koneksi dan migration Goose
 |       |-- model/           # Model dan role user

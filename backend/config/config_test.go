@@ -122,6 +122,31 @@ func TestLoadRejectsSeedUsersInProduction(t *testing.T) {
 	}
 }
 
+func TestLoadGatewayUpstreamURLs(t *testing.T) {
+	setRequiredEnvironment(t)
+	t.Setenv("GATEWAY_SMARTBANK_URL", " https://smartbank.example.test/api ")
+	t.Setenv("GATEWAY_MARKETPLACE_URL", "https://marketplace.example.test/api")
+	t.Setenv("GATEWAY_LOGISTICS_URL", "https://logistikita.example.test/api")
+	t.Setenv("GATEWAY_SUPPLIERHUB_URL", "https://supplierhub.example.test/api")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() returned an unexpected error: %v", err)
+	}
+
+	if cfg.GatewaySmartBankURL != "https://smartbank.example.test/api" {
+		t.Fatalf("GatewaySmartBankURL = %q", cfg.GatewaySmartBankURL)
+	}
+	if cfg.GatewayMarketplaceURL != "https://marketplace.example.test/api" {
+		t.Fatalf("GatewayMarketplaceURL = %q", cfg.GatewayMarketplaceURL)
+	}
+	if cfg.GatewayLogisticsURL != "https://logistikita.example.test/api" {
+		t.Fatalf("GatewayLogisticsURL = %q", cfg.GatewayLogisticsURL)
+	}
+	if cfg.GatewaySupplierHubURL != "https://supplierhub.example.test/api" {
+		t.Fatalf("GatewaySupplierHubURL = %q", cfg.GatewaySupplierHubURL)
+	}
+}
 func setRequiredEnvironment(t *testing.T) {
 	t.Helper()
 	t.Setenv("APP_ENV", "test")

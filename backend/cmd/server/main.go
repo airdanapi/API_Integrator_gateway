@@ -14,6 +14,7 @@ import (
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/chat"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/dashboard"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/database"
+	"github.com/airdanapi/API_Integrator_gateway/backend/internal/gateway"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/model"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/notification"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/repository"
@@ -87,6 +88,15 @@ func main() {
 	notificationService := notification.New(notificationRepository, logRepository, time.Now)
 	chatService := chat.New(chatRepository, userRepository, time.Now)
 
+	gatewayUpstreams := gateway.UpstreamConfig{
+		SmartBankURL:   cfg.GatewaySmartBankURL,
+		MarketplaceURL: cfg.GatewayMarketplaceURL,
+		LogisticsURL:   cfg.GatewayLogisticsURL,
+		SupplierHubURL: cfg.GatewaySupplierHubURL,
+	}
+	gatewayForwarder := gateway.NewHTTPForwarder(time.Now)
+	gatewayService := gateway.New(gatewayForwarder, logRepository, gatewayUpstreams, time.Now)
+
 	schedulerContext, stopScheduler := context.WithCancel(context.Background())
 	defer stopScheduler()
 	notification.StartScheduler(schedulerContext, notificationService, 5*time.Minute, log.Printf)
@@ -97,6 +107,7 @@ func main() {
 		DashboardService:    dashboardService,
 		NotificationService: notificationService,
 		ChatService:         chatService,
+		GatewayService:      gatewayService,
 	})
 	serverErrors := make(chan error, 1)
 

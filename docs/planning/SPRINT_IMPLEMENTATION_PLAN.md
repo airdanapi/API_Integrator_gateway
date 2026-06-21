@@ -275,7 +275,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 
 ## Sprint 10: Chat System
 **Duration:** Week 10  
-**Status:** Selesai pada 21 Juni 2026  
+**Status:** Selesai pada 21 Juni 2026
 **Goal:** Implementasi fitur chat untuk komunikasi admin-user.
 
 ### Tasks (Backend)
@@ -312,6 +312,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 
 ## Sprint 11: Gateway Routing & API Integration
 **Duration:** Week 11  
+**Status:** Selesai pada 21 Juni 2026
 **Goal:** Implementasi gateway routing untuk forward request ke SmartBank dan aplikasi lain.
 
 ### Tasks (Backend)
@@ -411,7 +412,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 | 8 | 8 | Dashboard User & Monitoring | Planning |
 | 9 | 9 | Notifications | Selesai |
 | 10 | 10 | Chat System | Selesai |
-| 11 | 11 | Gateway & Integration | Planning |
+| 11 | 11 | Gateway & Integration | Selesai |
 | 12 | 12 | Testing & Deployment | Planning |
 
 ---

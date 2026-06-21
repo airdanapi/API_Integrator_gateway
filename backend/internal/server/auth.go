@@ -24,6 +24,7 @@ type Dependencies struct {
 	DashboardService    DashboardService
 	NotificationService NotificationService
 	ChatService         ChatService
+	GatewayService      GatewayService
 }
 
 func loginHandler(service LoginService) fiber.Handler {
