@@ -14,6 +14,7 @@ import (
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/dashboard"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/database"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/model"
+	"github.com/airdanapi/API_Integrator_gateway/backend/internal/notification"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/repository"
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/server"
 )
@@ -79,12 +80,19 @@ func main() {
 	authService := auth.NewService(userRepository, passwordHasher, jwtService)
 
 	logRepository := repository.NewMySQLLogRepository(db)
+	notificationRepository := repository.NewMySQLNotificationRepository(db)
 	dashboardService := dashboard.New(logRepository)
+	notificationService := notification.New(notificationRepository, logRepository, time.Now)
+
+	schedulerContext, stopScheduler := context.WithCancel(context.Background())
+	defer stopScheduler()
+	notification.StartScheduler(schedulerContext, notificationService, 5*time.Minute, log.Printf)
 
 	app := server.NewApp(cfg, server.Dependencies{
-		AuthService:      authService,
-		TokenVerifier:    jwtService,
-		DashboardService: dashboardService,
+		AuthService:         authService,
+		TokenVerifier:       jwtService,
+		DashboardService:    dashboardService,
+		NotificationService: notificationService,
 	})
 	serverErrors := make(chan error, 1)
 

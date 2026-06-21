@@ -42,6 +42,10 @@ const sampleData = {
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
+
+vi.mock('../components/NotificationBell', () => ({
+  default: () => <button type="button">Notifikasi</button>,
+}))
 function renderPage(fetchData) {
   return render(
     <MemoryRouter>

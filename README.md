@@ -32,6 +32,8 @@ Layanan yang tersedia:
 - Backend landing content: <http://localhost:8080/landing>
 - Backend login: `POST http://localhost:8080/auth/login`
 - Backend current user: `GET http://localhost:8080/auth/me`
+- Backend notifications: `GET http://localhost:8080/notifications`
+- Backend mark notifications read: `POST http://localhost:8080/notifications/read`
 - MySQL: `localhost:3306` secara default
 
 Hentikan layanan dengan `docker compose down`. Data MySQL dipertahankan pada
@@ -159,6 +161,59 @@ Kredensial tersebut hanya untuk development dan harus diganti pada environment
 bersama. Dashboard Sprint 4 masih berupa placeholder; data operasional admin
 dan user dijadwalkan pada sprint dashboard berikutnya.
 
+## Notifications Sprint 9
+
+Endpoint notifikasi memakai JWT Bearer token dan table `notifications` dari Sprint 5. Role visibility:
+
+- `admin_gateway`: melihat semua notifikasi.
+- `monitoring_user`: melihat semua notifikasi.
+- `app_user`: hanya melihat notifikasi milik `app_name` pada token.
+
+`GET /notifications?page=1&limit=10` mengembalikan notifikasi terbaru, unread count, dan metadata pagination. `limit` default `10` dan maksimum `50`.
+
+```json
+{
+  "status": "success",
+  "data": {
+    "notifications": [
+      {
+        "id": 1,
+        "created_at": "2026-06-21T00:00:00Z",
+        "app_name": "Marketplace",
+        "type": "api_inactive",
+        "message": "API Marketplace tidak aktif selama lebih dari 1 minggu.",
+        "is_read": false
+      }
+    ],
+    "unread_count": 1,
+    "page": 1,
+    "limit": 10
+  }
+}
+```
+
+`POST /notifications/read` menerima salah satu body berikut:
+
+```json
+{ "notification_id": 1 }
+```
+
+```json
+{ "all": true }
+```
+
+Response sukses:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "unread_count": 0
+  }
+}
+```
+
+Backend scheduler membuat alert saat startup lalu setiap 5 menit untuk `api_inactive`, `error_rate`, dan `response_time`. Alert didedup berdasarkan `app_name + type` selama 24 jam.
 ## Test dan build
 
 Frontend:
@@ -199,6 +254,7 @@ docker compose ps
 |   |-- config/              # Environment configuration
 |   `-- internal/
 |       |-- auth/            # Bcrypt, JWT, login service, dan seed
+|       |-- notification/    # Service notifikasi, alert generator, dan scheduler
 |       |-- database/        # Koneksi dan migration Goose
 |       |-- model/           # Model dan role user
 |       |-- repository/      # Repository MySQL

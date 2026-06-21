@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/airdanapi/API_Integrator_gateway/backend/internal/model"
@@ -17,6 +18,7 @@ type LogRepository interface {
 	CountByStatus(ctx context.Context, since time.Time) (map[int]int64, error)
 	CountByStatusForApp(ctx context.Context, appName string, since time.Time) (map[int]int64, error)
 	CountBySourceApp(ctx context.Context, since time.Time) (map[string]int64, error)
+	AverageDurationForApp(ctx context.Context, appName string, since time.Time) (int, int64, error)
 }
 
 // MySQLLogRepository mengimplementasikan LogRepository menggunakan MySQL.
@@ -152,6 +154,26 @@ func (r *MySQLLogRepository) CountBySourceApp(ctx context.Context, since time.Ti
 		result[app] = count
 	}
 	return result, rows.Err()
+}
+
+// AverageDurationForApp menghitung rata-rata duration_ms untuk satu aplikasi sejak waktu tertentu.
+func (r *MySQLLogRepository) AverageDurationForApp(ctx context.Context, appName string, since time.Time) (int, int64, error) {
+	var avg sql.NullFloat64
+	var samples int64
+	err := r.db.QueryRowContext(
+		ctx,
+		`SELECT AVG(duration_ms), COUNT(duration_ms)
+		 FROM request_logs
+		 WHERE source_app = ? AND timestamp >= ? AND duration_ms IS NOT NULL`,
+		appName, since,
+	).Scan(&avg, &samples)
+	if err != nil {
+		return 0, 0, fmt.Errorf("average duration for app: %w", err)
+	}
+	if !avg.Valid {
+		return 0, samples, nil
+	}
+	return int(math.Round(avg.Float64)), samples, nil
 }
 
 // scanRequestLogs mem-parse baris SQL menjadi slice RequestLog.

@@ -228,6 +228,7 @@ func main() {
   app.Get("/dashboard/user", controllers.UserDashboard)
   app.Get("/dashboard/monitoring", controllers.MonitoringDashboard)
   app.Get("/notifications", controllers.GetNotifications)
+  app.Post("/notifications/read", controllers.MarkNotificationRead)
   app.Get("/chat/history", controllers.GetChatHistory)
   app.Post("/chat/message", controllers.SendChatMessage)
   app.Post("/gateway/payment", controllers.GatewayPayment)
@@ -285,10 +286,16 @@ func JWTProtected(c *fiber.Ctx) error {
   - Output: `{ summary_data, analytics_links, read_only_access }`
 
 #### Notifications
-- `GET /notifications`
-  - Output: `{ notifications }`
-  - Contoh: notifikasi API yang tidak aktif selama 1 minggu.
-
+- `GET /notifications?page=1&limit=10`
+  - Protected endpoint dengan JWT Bearer token.
+  - Query `page` default `1`; `limit` default `10` dan maksimum `50`.
+  - Output: `{ status, data: { notifications, unread_count, page, limit } }`.
+  - Role visibility: `admin_gateway` dan `monitoring_user` melihat semua notifikasi; `app_user` hanya melihat notifikasi sesuai `app_name` token.
+- `POST /notifications/read`
+  - Protected endpoint dengan body `{ "notification_id": 1 }` untuk single mark-read atau `{ "all": true }` untuk semua notifikasi visible.
+  - Output: `{ status, data: { unread_count } }`.
+  - Error: `400` body invalid, `401` tanpa token, `403` role tidak valid, `404` notifikasi tidak visible/tidak ditemukan.
+- Alert generator berjalan saat backend start lalu interval 5 menit untuk `api_inactive`, `error_rate`, dan `response_time`.
 #### Chat
 - `POST /chat/message`
   - Input: `{ from_user, to_user, message, timestamp }`
@@ -322,6 +329,7 @@ func JWTProtected(c *fiber.Ctx) error {
 - Admin memiliki akses ke `/dashboard/admin` dan semua log.
 - `app_user` memiliki akses ke `/dashboard/user` dan endpoint gateway sesuai peran aplikasi.
 - `monitoring_user` hanya memiliki akses read-only ke `/dashboard/monitoring` dan tidak dapat memanggil endpoint transaksi.
+- Endpoint notifikasi dapat dibaca oleh `admin_gateway` dan `monitoring_user` untuk semua aplikasi, sedangkan `app_user` hanya untuk aplikasinya sendiri.
 
 ## 8. Database dan Model Data
 

@@ -22,6 +22,7 @@ pelaporan proyek API Integrator Gateway.
 | [Sprint 7 Report](report/SPRINT_07_REPORT.md) | Laporan Dashboard Admin frontend: AdminDashboardPage, traffic cards, service indicators, audit table, polling 30s, fix jsdom 28 pada 19 Juni 2026. |
 | [Sprint 8 Report](report/SPRINT_08_REPORT.md) | Laporan Dashboard User & Monitoring: endpoint /dashboard/user dan /dashboard/monitoring, UserDashboardPage, MonitoringDashboardPage, RBAC, TDD 48 test pada 19 Juni 2026. |
 | [Pre-Sprint 9 Hardening](report/PRE_SPRINT_09_HARDENING.md) | Catatan baseline hardening frontend sebelum Sprint 9 Notifications: lint, stabilitas Vitest, build, backend regression, dan smoke test pada 21 Juni 2026. |
+| [Sprint 9 Report](report/SPRINT_09_REPORT.md) | Laporan Notifications System: backend notification API, scheduler alert, frontend bell/dropdown, mark-read, TDD, Docker checklist, dan smoke test pada 21 Juni 2026. |
 | [Miscellaneous Source Data](misc/source-data/) | Data CSV sumber tugas besar yang dipertahankan sebagai referensi. |
 
 ## Struktur

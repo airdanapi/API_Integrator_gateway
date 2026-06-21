@@ -8,6 +8,9 @@ import { ACCESS_TOKEN_KEY } from './auth/session'
 // Mencegah Dashboard page memanggil API sungguhan saat test navigasi App.
 // Tanpa ini, api.get('/dashboard/...') dipanggil → server mengembalikan 401
 // → token dihapus → user terpaksa logout → heading dashboard tidak ditemukan.
+vi.mock('./components/NotificationBell', () => ({
+  default: () => <button type="button">Notifikasi</button>,
+}))
 vi.mock('./services/dashboard', () => ({
   fetchAdminDashboard: vi.fn(() => new Promise(() => {})),      // loading selamanya
   fetchUserDashboard: vi.fn(() => new Promise(() => {})),       // loading selamanya

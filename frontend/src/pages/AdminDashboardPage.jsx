@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import BrandMark from '../components/BrandMark'
+import NotificationBell from '../components/NotificationBell'
 import { useAuth } from '../auth/auth-context'
 import { api } from '../services/api'
 import { fetchAdminDashboard } from '../services/dashboard'
@@ -243,6 +244,7 @@ function AdminDashboardPage({ apiClient: propApiClient, fetchData = fetchAdminDa
             <span className="hidden text-sm text-slate-500 sm:block">
               {user?.username} · {user?.app_name}
             </span>
+            <NotificationBell apiClient={client} />
             <button
               type="button"
               onClick={handleLogout}

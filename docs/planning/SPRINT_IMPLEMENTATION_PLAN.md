@@ -239,6 +239,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 
 ## Sprint 9: Notifications System
 **Duration:** Week 9  
+**Status:** Selesai pada 21 Juni 2026
 **Goal:** Implementasi sistem notifikasi untuk API inactive dan alerts lainnya.
 
 ### Tasks (Backend)
@@ -407,7 +408,7 @@ Dokumen ini merupakan rencana implementasi untuk pengembangan sistem API Integra
 | 6 | 6 | Dashboard Admin Backend | Planning |
 | 7 | 7 | Dashboard Admin Frontend | Planning |
 | 8 | 8 | Dashboard User & Monitoring | Planning |
-| 9 | 9 | Notifications | Planning |
+| 9 | 9 | Notifications | Selesai |
 | 10 | 10 | Chat System | Planning |
 | 11 | 11 | Gateway & Integration | Planning |
 | 12 | 12 | Testing & Deployment | Planning |

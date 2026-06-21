@@ -19,9 +19,10 @@ type TokenVerifier interface {
 }
 
 type Dependencies struct {
-	AuthService      LoginService
-	TokenVerifier    TokenVerifier
-	DashboardService DashboardService
+	AuthService         LoginService
+	TokenVerifier       TokenVerifier
+	DashboardService    DashboardService
+	NotificationService NotificationService
 }
 
 func loginHandler(service LoginService) fiber.Handler {

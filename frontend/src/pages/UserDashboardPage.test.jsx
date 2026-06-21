@@ -10,6 +10,10 @@ vi.mock('../auth/auth-context', () => ({
   }),
 }))
 
+
+vi.mock('../components/NotificationBell', () => ({
+  default: () => <button type="button">Notifikasi</button>,
+}))
 function renderPage(fetchData) {
   return render(
     <MemoryRouter>

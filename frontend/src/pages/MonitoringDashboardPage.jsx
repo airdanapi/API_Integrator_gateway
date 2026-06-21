@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/auth-context'
 import { api } from '../services/api'
 import { fetchMonitoringDashboard } from '../services/dashboard'
+import NotificationBell from '../components/NotificationBell'
 
 const POLL_INTERVAL_MS = 30_000
 
@@ -166,6 +167,7 @@ function MonitoringDashboardPage({ apiClient: propApiClient, fetchData = fetchMo
               </span>
               {user?.username} · {user?.app_name}
             </span>
+            <NotificationBell apiClient={client} />
             <button
               type="button"
               onClick={handleLogout}

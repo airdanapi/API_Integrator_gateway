@@ -42,7 +42,7 @@ func NewApp(cfg config.Config, providedDependencies ...Dependencies) *fiber.App 
 		meHandler,
 	)
 
-	// Dashboard routes — semua memerlukan token valid
+	// Dashboard routes - semua memerlukan token valid.
 	app.Get(
 		"/dashboard/admin",
 		requireToken(dependencies.TokenVerifier),
@@ -62,6 +62,16 @@ func NewApp(cfg config.Config, providedDependencies ...Dependencies) *fiber.App 
 		monitoringDashboardHandler(dependencies.DashboardService),
 	)
 
+	app.Get(
+		"/notifications",
+		requireToken(dependencies.TokenVerifier),
+		notificationsListHandler(dependencies.NotificationService),
+	)
+	app.Post(
+		"/notifications/read",
+		requireToken(dependencies.TokenVerifier),
+		notificationReadHandler(dependencies.NotificationService),
+	)
+
 	return app
 }
-
