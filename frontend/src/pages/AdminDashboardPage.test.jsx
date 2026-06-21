@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import AdminDashboardPage from './AdminDashboardPage'
 
 // ─── mock auth-context ────────────────────────────────────────────────────────

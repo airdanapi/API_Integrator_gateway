@@ -179,9 +179,14 @@ function UserDashboardPage({ apiClient: propApiClient, fetchData = fetchUserDash
   }, [fetchData, client, page])
 
   useEffect(() => {
-    load()
+    const initialLoad = setTimeout(() => {
+      load()
+    }, 0)
     const timer = setInterval(() => load(false), POLL_INTERVAL_MS)
-    return () => clearInterval(timer)
+    return () => {
+      clearTimeout(initialLoad)
+      clearInterval(timer)
+    }
   }, [load])
 
   function handleLogout() {

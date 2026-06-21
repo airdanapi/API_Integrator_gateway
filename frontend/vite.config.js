@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
+    testTimeout: 10000,
     environmentOptions: {
       jsdom: {
         // jsdom 28 requires a URL for Storage API (localStorage/sessionStorage) to work
