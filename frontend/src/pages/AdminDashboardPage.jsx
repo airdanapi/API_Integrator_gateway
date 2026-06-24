@@ -6,6 +6,7 @@ import ChatDrawer from '../components/ChatDrawer'
 import { useAuth } from '../auth/auth-context'
 import { api } from '../services/api'
 import { fetchAdminDashboard } from '../services/dashboard'
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts'
 
 const POLL_INTERVAL_MS = 30_000
 
@@ -30,6 +31,76 @@ function StatusBadge({ status }) {
       />
       {isActive ? 'Aktif' : 'Tidak Aktif'}
     </span>
+  )
+}
+
+// ─── Charts ──────────────────────────────────────────────────────────────────
+
+function TrafficCompositionChart({ summary }) {
+  const data = [
+    { name: 'Sukses', value: summary?.success_count || 0 },
+    { name: 'Error', value: summary?.error_count || 0 },
+  ]
+  const COLORS = ['#10b981', '#ef4444']
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 h-[320px] flex flex-col">
+      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Komposisi Traffic</h2>
+      <div className="flex-1 min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              innerRadius={60}
+              outerRadius={80}
+              paddingAngle={5}
+              dataKey="value"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <RechartsTooltip formatter={(value) => [`${value} Request`, '']} />
+            <Legend verticalAlign="bottom" height={36} iconType="circle" />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  )
+}
+
+function ServiceHealthChart({ indicators }) {
+  const activeCount = indicators?.filter(i => i.status === 'active').length || 0
+  const inactiveCount = indicators?.filter(i => i.status !== 'active').length || 0
+  
+  const data = [
+    { name: 'Aktif', value: activeCount },
+    { name: 'Tidak Aktif', value: inactiveCount },
+  ]
+  const COLORS = ['#10b981', '#94a3b8']
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 h-[320px] flex flex-col">
+      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Kesehatan Layanan</h2>
+      <div className="flex-1 min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              innerRadius={0}
+              outerRadius={80}
+              dataKey="value"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <RechartsTooltip formatter={(value) => [`${value} Layanan`, '']} />
+            <Legend verticalAlign="bottom" height={36} iconType="circle" />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
   )
 }
 
@@ -309,6 +380,10 @@ function AdminDashboardPage({ apiClient: propApiClient, fetchData = fetchAdminDa
         {!loading && !error && data && (
           <>
             <TrafficSummaryCards summary={data.traffic_summary} />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <TrafficCompositionChart summary={data.traffic_summary} />
+              <ServiceHealthChart indicators={data.service_indicators ?? []} />
+            </div>
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="lg:col-span-1">
                 <ServiceIndicatorList indicators={data.service_indicators ?? []} />

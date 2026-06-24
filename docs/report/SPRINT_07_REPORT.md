@@ -12,20 +12,19 @@
 
 ## Ringkasan Eksekutif
 
-Sprint 7 mengimplementasikan UI Dashboard Admin yang functional: menampilkan
-data dari endpoint `/dashboard/admin` (Sprint 6) secara visual kepada pengguna
-dengan role `admin_gateway`. UI terdiri dari empat metric card traffic summary,
-daftar status layanan dengan badge warna, tabel audit log dengan pagination, dan
-polling otomatis setiap 30 detik.
-
 Sprint ini juga menyelesaikan bug kompatibilitas `localStorage` akibat
 perubahan breaking di jsdom 28 yang memengaruhi seluruh test suite (17 test
 gagal), dengan solusi polyfill di `setup.js` dan konfigurasi environment jsdom.
+
+> **Update Tambahan:** Grafik analitik (Visualisasi Recharts untuk *Traffic Composition* dan *Service Health*) yang sempat terlewat kini telah ditambahkan ke Admin Dashboard sesuai dengan permintaan di PRD.
 
 ## Fitur yang Diimplementasikan
 
 ### AdminDashboardPage (`pages/AdminDashboardPage.jsx`)
 
+- **Visualisasi Grafik (Recharts)** — 2 chart Donut:
+  - **Komposisi Traffic**: membandingkan request sukses dan error.
+  - **Kesehatan Layanan**: membandingkan jumlah layanan aktif dan tidak aktif.
 - **Traffic Summary Cards** — 4 kartu: Total Request, Sukses, Error, Success Rate
   - Warna per metrik: biru (total), hijau (sukses), merah (error), ungu (rate)
   - Nilai diambil langsung dari `traffic_summary` response backend
@@ -188,8 +187,9 @@ http://localhost:5173/login
 | --- | --- | --- |
 | `frontend/src/services/dashboard.js` | BARU | Service fetch dashboard API |
 | `frontend/src/services/dashboard.test.js` | BARU | 3 unit test service |
-| `frontend/src/pages/AdminDashboardPage.jsx` | BARU | Komponen dashboard admin |
-| `frontend/src/pages/AdminDashboardPage.test.jsx` | BARU | 7 test komponen |
+| `frontend/src/pages/AdminDashboardPage.jsx` | DIUBAH | Komponen dashboard admin (Recharts ditambahkan) |
+| `frontend/src/pages/AdminDashboardPage.test.jsx` | DIUBAH | 8 test komponen (Mock recharts) |
+| `frontend/package.json` | DIUBAH | Tambah library recharts |
 | `frontend/src/App.jsx` | DIUBAH | Route admin → AdminDashboardPage |
 | `frontend/src/App.test.jsx` | DIUBAH | Mock dashboard + fix assertion |
 | `frontend/src/test/setup.js` | DIUBAH | localStorage polyfill jsdom 28 |

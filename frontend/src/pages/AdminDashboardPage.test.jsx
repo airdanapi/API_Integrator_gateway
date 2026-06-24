@@ -12,6 +12,15 @@ vi.mock('../auth/auth-context', () => ({
   }),
 }))
 
+vi.mock('recharts', () => ({
+  ResponsiveContainer: ({ children }) => <div>{children}</div>,
+  PieChart: ({ children }) => <div data-testid="pie-chart">{children}</div>,
+  Pie: ({ children }) => <div>{children}</div>,
+  Cell: () => <div data-testid="cell" />,
+  Tooltip: () => null,
+  Legend: () => null,
+}))
+
 // ─── sample data ─────────────────────────────────────────────────────────────
 
 const sampleData = {
@@ -71,14 +80,21 @@ describe('AdminDashboardPage', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
-  it('renders traffic summary cards with correct data', async () => {
-    const mockFetch = vi.fn().mockResolvedValue(sampleData)
-    renderPage(mockFetch)
+  it('renders traffic summary cards and charts with correct data', async () => {
+    const fetchData = vi.fn().mockResolvedValue(sampleData)
+    renderPage(fetchData)
 
-    expect(await waitForData()).toBeInTheDocument()
-    expect(screen.getByText('84')).toBeInTheDocument()
-    expect(screen.getByText('84.0%')).toBeInTheDocument()
-    expect(screen.getByText('16')).toBeInTheDocument()
+    await waitForData()
+
+    expect(screen.getByText('100')).toBeInTheDocument() // Total Request
+    expect(screen.getByText('84')).toBeInTheDocument() // Sukses
+    expect(screen.getByText('16')).toBeInTheDocument() // Error
+    expect(screen.getByText('84.0%')).toBeInTheDocument() // Success Rate
+
+    // Check if charts are rendered
+    expect(screen.getByText('Komposisi Traffic')).toBeInTheDocument()
+    expect(screen.getByText('Kesehatan Layanan')).toBeInTheDocument()
+    expect(screen.getAllByTestId('pie-chart').length).toBe(2)
   })
 
   it('renders service indicators with correct status badges', async () => {
