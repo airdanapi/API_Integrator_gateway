@@ -16,6 +16,11 @@ vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }) => <div>{children}</div>,
   PieChart: ({ children }) => <div data-testid="pie-chart">{children}</div>,
   Pie: ({ children }) => <div>{children}</div>,
+  LineChart: ({ children }) => <div data-testid="line-chart">{children}</div>,
+  Line: () => null,
+  XAxis: () => null,
+  YAxis: () => null,
+  CartesianGrid: () => null,
   Cell: () => <div data-testid="cell" />,
   Tooltip: () => null,
   Legend: () => null,
@@ -31,6 +36,10 @@ const sampleData = {
     success_rate_pct: 84.0,
     avg_duration_ms: 120,
   },
+  traffic_history: [
+    { date: '2026-06-18', total_requests: 40, success_count: 35, error_count: 5 },
+    { date: '2026-06-19', total_requests: 60, success_count: 49, error_count: 11 },
+  ],
   service_indicators: [
     { app_name: 'Marketplace', status: 'inactive', last_request: '2026-06-10T00:00:00Z' },
     { app_name: 'POS', status: 'active', last_request: '2026-06-19T07:00:00Z' },
@@ -92,9 +101,10 @@ describe('AdminDashboardPage', () => {
     expect(screen.getByText('84.0%')).toBeInTheDocument() // Success Rate
 
     // Check if charts are rendered
-    expect(screen.getByText('Komposisi Traffic')).toBeInTheDocument()
+    expect(screen.getByText('Traffic Historis (7 Hari Terakhir)')).toBeInTheDocument()
     expect(screen.getByText('Kesehatan Layanan')).toBeInTheDocument()
-    expect(screen.getAllByTestId('pie-chart').length).toBe(2)
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument()
+    expect(screen.getByTestId('pie-chart')).toBeInTheDocument()
   })
 
   it('renders service indicators with correct status badges', async () => {

@@ -212,3 +212,44 @@ func nullableJSON(b []byte) sql.NullString {
 	}
 	return sql.NullString{String: string(b), Valid: true}
 }
+
+// GetTrafficHistory mengambil statistik traffic per hari.
+func (r *MySQLLogRepository) GetTrafficHistory(ctx context.Context, since time.Time) ([]model.TrafficHistoryEntry, error) {
+	query := `
+		SELECT 
+			DATE_FORMAT(timestamp, '%Y-%m-%d') as date, 
+			COUNT(*) as total_requests, 
+			SUM(CASE WHEN status >= 200 AND status < 300 THEN 1 ELSE 0 END) as success_count,
+			SUM(CASE WHEN status >= 400 THEN 1 ELSE 0 END) as error_count
+		FROM request_logs
+		WHERE timestamp >= ?
+		GROUP BY date
+		ORDER BY date ASC
+	`
+	rows, err := r.db.QueryContext(ctx, query, since)
+	if err != nil {
+		return nil, fmt.Errorf("query traffic history: %w", err)
+	}
+	defer rows.Close()
+
+	var history []model.TrafficHistoryEntry
+	for rows.Next() {
+		var entry model.TrafficHistoryEntry
+		var success sql.NullInt64
+		var errors sql.NullInt64
+		
+		if err := rows.Scan(&entry.Date, &entry.TotalRequests, &success, &errors); err != nil {
+			return nil, fmt.Errorf("scan traffic history row: %w", err)
+		}
+		
+		if success.Valid {
+			entry.SuccessCount = success.Int64
+		}
+		if errors.Valid {
+			entry.ErrorCount = errors.Int64
+		}
+		
+		history = append(history, entry)
+	}
+	return history, rows.Err()
+}

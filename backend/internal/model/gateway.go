@@ -25,6 +25,14 @@ type RequestLog struct {
 	DurationMS *int
 }
 
+// TrafficHistoryEntry merepresentasikan statistik per hari.
+type TrafficHistoryEntry struct {
+	Date          string `json:"date"`
+	TotalRequests int64  `json:"total_requests"`
+	SuccessCount  int64  `json:"success_count"`
+	ErrorCount    int64  `json:"error_count"`
+}
+
 // Notification merepresentasikan satu notifikasi sistem.
 type Notification struct {
 	ID        int64

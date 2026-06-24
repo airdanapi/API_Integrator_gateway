@@ -73,6 +73,7 @@ type LogQuerier interface {
 	CountByStatus(ctx context.Context, since time.Time) (map[int]int64, error)
 	CountByStatusForApp(ctx context.Context, appName string, since time.Time) (map[int]int64, error)
 	CountBySourceApp(ctx context.Context, since time.Time) (map[string]int64, error)
+	GetTrafficHistory(ctx context.Context, since time.Time) ([]model.TrafficHistoryEntry, error)
 }
 
 // Service menyediakan logika bisnis dashboard admin.
@@ -175,6 +176,11 @@ func (s *Service) GetAuditLogs(ctx context.Context, limit, offset int) ([]AuditL
 		})
 	}
 	return entries, total, nil
+}
+
+// GetTrafficHistory mengambil data historis harian sejak waktu tertentu.
+func (s *Service) GetTrafficHistory(ctx context.Context, since time.Time) ([]model.TrafficHistoryEntry, error) {
+	return s.logs.GetTrafficHistory(ctx, since)
 }
 
 // trafficSummaryFromCounts menghitung TrafficSummary dari map status→count.

@@ -24,6 +24,7 @@ type DashboardService interface {
 	GetAuditLogs(ctx context.Context, limit, offset int) ([]dashboard.AuditLogEntry, int64, error)
 	GetUserDashboard(ctx context.Context, appName string, page, limit int) (dashboard.UserDashboard, error)
 	GetMonitoringDashboard(ctx context.Context) (dashboard.MonitoringDashboard, error)
+	GetTrafficHistory(ctx context.Context, since time.Time) ([]model.TrafficHistoryEntry, error)
 }
 
 // requireRole mengembalikan middleware yang memastikan user memiliki role tertentu.
@@ -79,11 +80,17 @@ func adminDashboardHandler(svc DashboardService) fiber.Handler {
 		if err != nil {
 			return internalError(c)
 		}
+		
+		history, err := svc.GetTrafficHistory(ctx, since)
+		if err != nil {
+			return internalError(c)
+		}
 
 		return c.JSON(fiber.Map{
 			"status": "success",
 			"data": fiber.Map{
 				"traffic_summary":    summary,
+				"traffic_history":    history,
 				"service_indicators": indicators,
 				"audit_logs": fiber.Map{
 					"items": logs,

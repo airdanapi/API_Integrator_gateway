@@ -6,7 +6,7 @@ import ChatDrawer from '../components/ChatDrawer'
 import { useAuth } from '../auth/auth-context'
 import { api } from '../services/api'
 import { fetchAdminDashboard } from '../services/dashboard'
-import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts'
+import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts'
 
 const POLL_INTERVAL_MS = 30_000
 
@@ -36,33 +36,41 @@ function StatusBadge({ status }) {
 
 // ─── Charts ──────────────────────────────────────────────────────────────────
 
-function TrafficCompositionChart({ summary }) {
-  const data = [
-    { name: 'Sukses', value: summary?.success_count || 0 },
-    { name: 'Error', value: summary?.error_count || 0 },
-  ]
-  const COLORS = ['#10b981', '#ef4444']
+function TrafficHistoryChart({ history }) {
+  if (!history || history.length === 0) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 h-[320px] flex flex-col justify-center items-center text-slate-400">
+        Tidak ada data historis.
+      </div>
+    )
+  }
+
+  // Format date to short string like "18/06"
+  const data = history.map(h => {
+    const d = new Date(h.date)
+    return {
+      name: `${d.getDate()}/${d.getMonth()+1}`,
+      Total: h.total_requests,
+      Sukses: h.success_count,
+      Error: h.error_count
+    }
+  })
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5 h-[320px] flex flex-col">
-      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Komposisi Traffic</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Traffic Historis (7 Hari Terakhir)</h2>
       <div className="flex-1 min-h-0">
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <RechartsTooltip formatter={(value) => [`${value} Request`, '']} />
+          <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
             <Legend verticalAlign="bottom" height={36} iconType="circle" />
-          </PieChart>
+            <Line type="monotone" dataKey="Total" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+            <Line type="monotone" dataKey="Sukses" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} />
+            <Line type="monotone" dataKey="Error" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} />
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
@@ -381,7 +389,7 @@ function AdminDashboardPage({ apiClient: propApiClient, fetchData = fetchAdminDa
           <>
             <TrafficSummaryCards summary={data.traffic_summary} />
             <div className="grid gap-6 lg:grid-cols-2">
-              <TrafficCompositionChart summary={data.traffic_summary} />
+              <TrafficHistoryChart history={data.traffic_history} />
               <ServiceHealthChart indicators={data.service_indicators ?? []} />
             </div>
             <div className="grid gap-6 lg:grid-cols-3">
